@@ -383,7 +383,7 @@
                     <i class="fas fa-sync-alt fa-spin mr-2 text-amber-700"></i>Sedang Login &amp; Menyiapkan Sistem
                 </span>
                 <h3 class="text-xl sm:text-2xl font-extrabold text-brown-950 tracking-tight">Memuat Database Sekolah</h3>
-                <p class="text-xs text-stone-500">...</p>
+                <p class="text-xs font-bold tracking-wider uppercase text-brown-800">SDN 22 TANAH KERAS</p>
             </div>
 
             <!-- Angka Persentase Besar 1% - 100% & Progress Bar -->
@@ -451,7 +451,7 @@
         <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-stone-900/50 z-20 hidden lg:hidden"></div>
 
         <!-- SIDEBAR NAVIGASI -->
-        <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-30 w-64 bg-brown-800 text-white flex flex-col justify-between transition-all duration-300 transform -translate-x-full lg:translate-x-0 overflow-hidden shrink-0 shadow-xl">
+        <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-30 w-64 lg:w-64 bg-brown-800 text-white flex flex-col justify-between transition-all duration-300 transform -translate-x-full lg:translate-x-0 overflow-hidden shrink-0 shadow-xl">
             <div class="flex flex-col flex-1 overflow-y-auto min-w-[16rem]">
                 <!-- Brand Header Sidebar -->
                 <div class="p-5 bg-brown-900 border-b border-brown-700 flex items-center justify-between">
@@ -595,11 +595,6 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-2.5">
-                    <button type="button" id="btnInstalPwaHeader" onclick="instalAplikasiAdmops()" title="Instal Aplikasi ADMOPS ke Desktop / HP"
-                        class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-brown-800 to-amber-800 hover:from-brown-900 hover:to-amber-900 text-white shadow-sm transition space-x-1.5">
-                        <i class="fas fa-download"></i>
-                        <span>Instal Aplikasi</span>
-                    </button>
                     <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-200 shadow-2xs">
                         <i class="fas fa-graduation-cap mr-1.5 text-amber-700"></i>
                         <span id="headerTahunAjaran">TA 2026/2027 - Ganjil</span>
@@ -608,6 +603,11 @@
                         <i class="fas fa-calendar-alt mr-2 text-brown-600"></i>
                         <span id="currentDate"></span>
                     </span>
+                    <span id="networkStatusBadge" title="Status Koneksi Internet Perangkat"
+                        class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs transition">
+                        <span id="networkStatusDot" class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
+                        <span id="networkStatusText">Online</span>
+                    </span>
                     <button type="button" id="btnCloudSyncHeader" onclick="sinkronisasiManualGoogleSheet()" title="Sinkronkan & Muat Ulang Data dari Google Sheet"
                         class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-2xs transition space-x-1.5">
                         <i id="cloudSyncIcon" class="fas fa-cloud text-emerald-600"></i>
@@ -615,6 +615,18 @@
                     </button>
                 </div>
             </header>
+
+            <!-- Spanduk Peringatan Jaringan Offline Otomatis -->
+            <div id="offlineAlertBanner" class="hidden bg-red-600 text-white px-6 py-2.5 text-xs sm:text-sm font-semibold flex flex-wrap items-center justify-between gap-2 shadow-md z-10">
+                <div class="flex items-center space-x-2.5">
+                    <i class="fas fa-wifi text-amber-200 animate-pulse"></i>
+                    <span>Koneksi terputus! <strong>Periksa jaringan Anda</strong> — Aplikasi sedang dalam mode <strong>Offline</strong>. Perubahan disimpan sementara di perangkat.</span>
+                </div>
+                <button type="button" onclick="periksaKoneksiJaringan(true)"
+                    class="px-3 py-1 rounded-lg bg-white/20 hover:bg-white/30 text-white text-xs font-bold transition shrink-0">
+                    <i class="fas fa-sync-alt mr-1"></i>Cek Jaringan
+                </button>
+            </div>
 
             <!-- Area Konten Dinamis -->
             <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
@@ -639,10 +651,6 @@
                                 <button type="button" onclick="navigate('siswa-aktif')" class="px-4 py-2.5 bg-white text-brown-900 hover:bg-brown-50 text-xs font-bold rounded-xl shadow-md transition flex items-center space-x-2">
                                     <i class="fas fa-user-graduate text-brown-700"></i>
                                     <span>Kelola PD Aktif</span>
-                                </button>
-                                <button type="button" onclick="instalAplikasiAdmops()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-brown-950 text-xs font-extrabold rounded-xl shadow-md transition flex items-center space-x-2">
-                                    <i class="fas fa-download"></i>
-                                    <span>Instal Aplikasi</span>
                                 </button>
                             </div>
                         </div>
@@ -941,54 +949,59 @@
                     
                     <!-- Tabel Daftar Siswa -->
                     <div class="bg-white rounded-2xl border border-brown-200 shadow-sm overflow-hidden">
-                        <div class="p-5 bg-brown-50 border-b border-brown-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                            <div>
+                        <div class="p-4 bg-brown-50 border-b border-brown-200 space-y-2.5">
+                            <!-- Baris 1: Judul & Total Terdaftar di atas tabel -->
+                            <div class="flex items-center justify-between gap-2">
                                 <h4 class="font-bold text-brown-900 text-base">PD Aktif</h4>
                                 <p class="text-xs text-stone-500">Total terdaftar: <span id="tableCountSiswa" class="font-bold text-brown-800">0</span> siswa</p>
                             </div>
-                            <!-- Tombol Tambah Data, Pencarian & Filter -->
-                            <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5">
-                                <button type="button" id="btnTambahSiswa" onclick="bukaFormSiswa()" class="px-4 py-2 bg-brown-700 hover:bg-brown-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                                    <i class="fas fa-plus"></i>
-                                    <span>Tambah Data</span>
-                                </button>
-                                <button type="button" onclick="bukaModalImporExcel('siswa')" class="px-4 py-2 bg-sky-700 hover:bg-sky-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                                    <i class="fas fa-file-import"></i>
-                                    <span>Impor Excel</span>
-                                </button>
-                                <button type="button" onclick="bukaModalKenaikanKelas()" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                                    <i class="fas fa-level-up-alt"></i>
-                                    <span>Kenaikan Kelas</span>
-                                </button>
-                                <button type="button" onclick="cetakDataSiswa()" class="px-4 py-2 bg-stone-700 hover:bg-stone-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                                    <i class="fas fa-print"></i>
-                                    <span>Cetak</span>
-                                </button>
-                                <button type="button" onclick="exportExcelSiswa()" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                                    <i class="fas fa-file-excel"></i>
-                                    <span>Cetak Excel</span>
-                                </button>
-                                <select id="filterTahunSiswa" onchange="renderTabelSiswa()" class="px-3 py-2 text-sm rounded-xl border border-brown-300 bg-white outline-none focus:border-brown-600 font-medium text-brown-900">
-                                    <option value="">Semua Tahun Pelajaran</option>
-                                </select>
-                                <select id="filterSemesterSiswa" onchange="renderTabelSiswa()" class="px-3 py-2 text-sm rounded-xl border border-brown-300 bg-white outline-none focus:border-brown-600">
-                                    <option value="">Semua Semester</option>
-                                    <option value="Ganjil">Semester Ganjil</option>
-                                    <option value="Genap">Semester Genap</option>
-                                </select>
-                                <select id="filterKelas" onchange="renderTabelSiswa()" class="px-3 py-2 text-sm rounded-xl border border-brown-300 bg-white outline-none focus:border-brown-600">
-                                    <option value="">Semua Kelas</option>
-                                    <option value="Kelas 1">Kelas 1</option>
-                                    <option value="Kelas 2">Kelas 2</option>
-                                    <option value="Kelas 3">Kelas 3</option>
-                                    <option value="Kelas 4">Kelas 4</option>
-                                    <option value="Kelas 5">Kelas 5</option>
-                                    <option value="Kelas 6">Kelas 6</option>
-                                </select>
-                                <div class="relative">
-                                    <input type="text" id="searchSiswa" onkeyup="renderTabelSiswa()" placeholder="Cari nama / NISN / NIK..."
-                                        class="w-full sm:w-64 pl-9 pr-4 py-2 text-sm rounded-xl border border-brown-300 outline-none focus:border-brown-600">
-                                    <i class="fas fa-search absolute left-3 top-2.5 text-stone-400 text-sm"></i>
+                            <!-- Baris 2: Tombol Aksi & Filter Sejajar Satu Baris -->
+                            <div class="flex items-center justify-between gap-1.5 overflow-x-auto pb-0.5">
+                                <div class="flex items-center gap-1.5 shrink-0">
+                                    <button type="button" id="btnTambahSiswa" onclick="bukaFormSiswa()" class="px-2.5 py-1.5 bg-brown-700 hover:bg-brown-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                        <i class="fas fa-plus"></i>
+                                        <span>Tambah Data</span>
+                                    </button>
+                                    <button type="button" onclick="bukaModalImporExcel('siswa')" class="px-2.5 py-1.5 bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                        <i class="fas fa-file-import"></i>
+                                        <span>Impor Excel</span>
+                                    </button>
+                                    <button type="button" onclick="bukaModalKenaikanKelas()" class="px-2.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                        <i class="fas fa-level-up-alt"></i>
+                                        <span>Kenaikan Kelas</span>
+                                    </button>
+                                    <button type="button" onclick="cetakDataSiswa()" class="px-2.5 py-1.5 bg-stone-700 hover:bg-stone-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                        <i class="fas fa-print"></i>
+                                        <span>Cetak</span>
+                                    </button>
+                                    <button type="button" onclick="exportExcelSiswa()" class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                        <i class="fas fa-file-excel"></i>
+                                        <span>Cetak Excel</span>
+                                    </button>
+                                </div>
+                                <div class="flex items-center gap-1.5 shrink-0">
+                                    <select id="filterTahunSiswa" onchange="renderTabelSiswa()" class="px-2.5 py-1.5 text-xs rounded-lg border border-brown-300 bg-white outline-none focus:border-brown-600 font-medium text-brown-900">
+                                        <option value="">Semua TP</option>
+                                    </select>
+                                    <select id="filterSemesterSiswa" onchange="renderTabelSiswa()" class="px-2.5 py-1.5 text-xs rounded-lg border border-brown-300 bg-white outline-none focus:border-brown-600">
+                                        <option value="">Semua Semester</option>
+                                        <option value="Ganjil">Ganjil</option>
+                                        <option value="Genap">Genap</option>
+                                    </select>
+                                    <select id="filterKelas" onchange="renderTabelSiswa()" class="px-2.5 py-1.5 text-xs rounded-lg border border-brown-300 bg-white outline-none focus:border-brown-600">
+                                        <option value="">Semua Kelas</option>
+                                        <option value="Kelas 1">Kelas 1</option>
+                                        <option value="Kelas 2">Kelas 2</option>
+                                        <option value="Kelas 3">Kelas 3</option>
+                                        <option value="Kelas 4">Kelas 4</option>
+                                        <option value="Kelas 5">Kelas 5</option>
+                                        <option value="Kelas 6">Kelas 6</option>
+                                    </select>
+                                    <div class="relative">
+                                        <input type="text" id="searchSiswa" onkeyup="renderTabelSiswa()" placeholder="Cari nama / NISN / NIK..."
+                                            class="w-44 xl:w-52 pl-7 pr-3 py-1.5 text-xs rounded-lg border border-brown-300 bg-white outline-none focus:border-brown-600">
+                                        <i class="fas fa-search absolute left-2.5 top-2 text-stone-400 text-xs"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1019,32 +1032,38 @@
                 <!-- ========================================== -->
                 <section id="section-siswa-keluar" class="page-section hidden space-y-6">
                     <div class="bg-white rounded-2xl border border-brown-200 shadow-sm overflow-hidden">
-                        <div class="p-5 bg-brown-50 border-b border-brown-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                            <div>
-                                <h4 class="font-bold text-brown-900 text-base">Daftar Peserta Didik Keluar / Mutasi (PD Keluar)</h4>
+                        <div class="p-4 bg-brown-50 border-b border-brown-200 space-y-2.5">
+                            <!-- Baris 1: Judul & Total Tercatat di atas tabel -->
+                            <div class="flex items-center justify-between gap-2">
+                                <h4 class="font-bold text-brown-900 text-base">PD Keluar</h4>
                                 <p class="text-xs text-stone-500">Total tercatat: <span id="tableCountSiswaKeluar" class="font-bold text-amber-800">0</span> siswa keluar</p>
                             </div>
-                            <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5">
-                                <button type="button" onclick="cetakDataSiswaKeluar()" class="px-4 py-2 bg-stone-700 hover:bg-stone-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                                    <i class="fas fa-print"></i>
-                                    <span>Cetak</span>
-                                </button>
-                                <button type="button" onclick="exportExcelSiswaKeluar()" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                                    <i class="fas fa-file-excel"></i>
-                                    <span>Cetak Excel</span>
-                                </button>
-                                <select id="filterJenisKeluar" onchange="renderTabelSiswaKeluar()" class="px-3 py-2 text-sm rounded-xl border border-brown-300 bg-white outline-none focus:border-brown-600">
-                                    <option value="">Semua Status Keluar</option>
-                                    <option value="Lulus / Tamat Belajar">Lulus / Tamat Belajar</option>
-                                    <option value="Mutasi (Pindah Sekolah)">Mutasi (Pindah Sekolah)</option>
-                                    <option value="Mengundurkan Diri">Mengundurkan Diri</option>
-                                    <option value="Putus Sekolah">Putus Sekolah</option>
-                                    <option value="Wafat">Wafat</option>
-                                </select>
-                                <div class="relative">
-                                    <input type="text" id="searchSiswaKeluar" onkeyup="renderTabelSiswaKeluar()" placeholder="Cari nama / NISN / No. Surat..."
-                                        class="w-full sm:w-64 pl-9 pr-4 py-2 text-sm rounded-xl border border-brown-300 outline-none focus:border-brown-600">
-                                    <i class="fas fa-search absolute left-3 top-2.5 text-stone-400 text-sm"></i>
+                            <!-- Baris 2: Tombol Aksi & Filter Sejajar Satu Baris -->
+                            <div class="flex items-center justify-between gap-1.5 overflow-x-auto pb-0.5">
+                                <div class="flex items-center gap-1.5 shrink-0">
+                                    <button type="button" onclick="cetakDataSiswaKeluar()" class="px-2.5 py-1.5 bg-stone-700 hover:bg-stone-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                        <i class="fas fa-print"></i>
+                                        <span>Cetak</span>
+                                    </button>
+                                    <button type="button" onclick="exportExcelSiswaKeluar()" class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                        <i class="fas fa-file-excel"></i>
+                                        <span>Cetak Excel</span>
+                                    </button>
+                                </div>
+                                <div class="flex items-center gap-1.5 shrink-0">
+                                    <select id="filterJenisKeluar" onchange="renderTabelSiswaKeluar()" class="px-2.5 py-1.5 text-xs rounded-lg border border-brown-300 bg-white outline-none focus:border-brown-600">
+                                        <option value="">Semua Status Keluar</option>
+                                        <option value="Lulus / Tamat Belajar">Lulus / Tamat Belajar</option>
+                                        <option value="Mutasi (Pindah Sekolah)">Mutasi (Pindah Sekolah)</option>
+                                        <option value="Mengundurkan Diri">Mengundurkan Diri</option>
+                                        <option value="Putus Sekolah">Putus Sekolah</option>
+                                        <option value="Wafat">Wafat</option>
+                                    </select>
+                                    <div class="relative">
+                                        <input type="text" id="searchSiswaKeluar" onkeyup="renderTabelSiswaKeluar()" placeholder="Cari nama / NISN / No. Surat..."
+                                            class="w-48 xl:w-56 pl-7 pr-3 py-1.5 text-xs rounded-lg border border-brown-300 bg-white outline-none focus:border-brown-600">
+                                        <i class="fas fa-search absolute left-2.5 top-2 text-stone-400 text-xs"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1075,48 +1094,54 @@
                 <!-- ========================================== -->
                 <section id="section-siswa-nis" class="page-section hidden space-y-6">
                     <div class="bg-white rounded-2xl border border-brown-200 shadow-sm overflow-hidden">
-                        <div class="p-5 bg-brown-50 border-b border-brown-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                            <div>
+                        <div class="p-4 bg-brown-50 border-b border-brown-200 space-y-2.5">
+                            <!-- Baris 1: Judul & Total Tercatat di atas tabel -->
+                            <div class="flex items-center justify-between gap-2">
                                 <h4 class="font-bold text-brown-900 text-base">Data NIS</h4>
                                 <p class="text-xs text-stone-500">Total tercatat: <span id="tableCountNis" class="font-bold text-brown-800">0</span> data NIS</p>
                             </div>
-                            <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5">
-                                <button type="button" onclick="bukaModalNis()" class="px-4 py-2 bg-brown-700 hover:bg-brown-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                                    <i class="fas fa-plus"></i>
-                                    <span>Tambah Data NIS</span>
-                                </button>
-                                <button type="button" onclick="bukaModalCekNis()" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                                    <i class="fas fa-search-plus"></i>
-                                    <span>Cek NIS</span>
-                                </button>
-                                <button type="button" onclick="bukaModalImporExcel('nis')" class="px-4 py-2 bg-sky-700 hover:bg-sky-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                                    <i class="fas fa-file-import"></i>
-                                    <span>Impor Excel</span>
-                                </button>
-                                <button type="button" onclick="cetakDataNis()" class="px-4 py-2 bg-stone-700 hover:bg-stone-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                                    <i class="fas fa-print"></i>
-                                    <span>Cetak</span>
-                                </button>
-                                <button type="button" onclick="exportExcelNis()" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                                    <i class="fas fa-file-excel"></i>
-                                    <span>Cetak Excel</span>
-                                </button>
-                                <select id="filterTahunNis" onchange="renderTabelNis()" class="px-3 py-2 text-sm rounded-xl border border-brown-300 bg-white outline-none focus:border-brown-600 font-medium text-brown-900">
-                                    <option value="">Semua Tahun Pelajaran</option>
-                                </select>
-                                <select id="filterKelasNis" onchange="renderTabelNis()" class="px-3 py-2 text-sm rounded-xl border border-brown-300 bg-white outline-none focus:border-brown-600">
-                                    <option value="">Semua Kelas</option>
-                                    <option value="Kelas 1">Kelas 1</option>
-                                    <option value="Kelas 2">Kelas 2</option>
-                                    <option value="Kelas 3">Kelas 3</option>
-                                    <option value="Kelas 4">Kelas 4</option>
-                                    <option value="Kelas 5">Kelas 5</option>
-                                    <option value="Kelas 6">Kelas 6</option>
-                                </select>
-                                <div class="relative">
-                                    <input type="text" id="searchNis" onkeyup="renderTabelNis()" placeholder="Cari nama / NIS / keterangan..."
-                                        class="w-full sm:w-64 pl-9 pr-4 py-2 text-sm rounded-xl border border-brown-300 outline-none focus:border-brown-600">
-                                    <i class="fas fa-search absolute left-3 top-2.5 text-stone-400 text-sm"></i>
+                            <!-- Baris 2: Tombol Aksi & Filter Sejajar Satu Baris -->
+                            <div class="flex items-center justify-between gap-1.5 overflow-x-auto pb-0.5">
+                                <div class="flex items-center gap-1.5 shrink-0">
+                                    <button type="button" onclick="bukaModalNis()" class="px-2.5 py-1.5 bg-brown-700 hover:bg-brown-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                        <i class="fas fa-plus"></i>
+                                        <span>Tambah Data NIS</span>
+                                    </button>
+                                    <button type="button" onclick="bukaModalCekNis()" class="px-2.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                        <i class="fas fa-search-plus"></i>
+                                        <span>Cek NIS</span>
+                                    </button>
+                                    <button type="button" onclick="bukaModalImporExcel('nis')" class="px-2.5 py-1.5 bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                        <i class="fas fa-file-import"></i>
+                                        <span>Impor Excel</span>
+                                    </button>
+                                    <button type="button" onclick="cetakDataNis()" class="px-2.5 py-1.5 bg-stone-700 hover:bg-stone-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                        <i class="fas fa-print"></i>
+                                        <span>Cetak</span>
+                                    </button>
+                                    <button type="button" onclick="exportExcelNis()" class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                        <i class="fas fa-file-excel"></i>
+                                        <span>Cetak Excel</span>
+                                    </button>
+                                </div>
+                                <div class="flex items-center gap-1.5 shrink-0">
+                                    <select id="filterTahunNis" onchange="renderTabelNis()" class="px-2.5 py-1.5 text-xs rounded-lg border border-brown-300 bg-white outline-none focus:border-brown-600 font-medium text-brown-900">
+                                        <option value="">Semua TP</option>
+                                    </select>
+                                    <select id="filterKelasNis" onchange="renderTabelNis()" class="px-2.5 py-1.5 text-xs rounded-lg border border-brown-300 bg-white outline-none focus:border-brown-600">
+                                        <option value="">Semua Kelas</option>
+                                        <option value="Kelas 1">Kelas 1</option>
+                                        <option value="Kelas 2">Kelas 2</option>
+                                        <option value="Kelas 3">Kelas 3</option>
+                                        <option value="Kelas 4">Kelas 4</option>
+                                        <option value="Kelas 5">Kelas 5</option>
+                                        <option value="Kelas 6">Kelas 6</option>
+                                    </select>
+                                    <div class="relative">
+                                        <input type="text" id="searchNis" onkeyup="renderTabelNis()" placeholder="Cari nama / NIS / ket..."
+                                            class="w-44 xl:w-52 pl-7 pr-3 py-1.5 text-xs rounded-lg border border-brown-300 bg-white outline-none focus:border-brown-600">
+                                        <i class="fas fa-search absolute left-2.5 top-2 text-stone-400 text-xs"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1147,40 +1172,46 @@
         <!-- ========================================== -->
         <section id="section-gtk-guru" class="page-section hidden space-y-6">
             <div class="bg-white rounded-2xl border border-brown-200 shadow-sm overflow-hidden">
-                <div class="p-5 bg-brown-50 border-b border-brown-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div>
-                        <h4 class="font-bold text-brown-900 text-base">Daftar Pendidik / Guru (GTK)</h4>
+                <div class="p-4 bg-brown-50 border-b border-brown-200 space-y-2.5">
+                    <!-- Baris 1: Judul & Total Tercatat di atas tabel -->
+                    <div class="flex items-center justify-between gap-2">
+                        <h4 class="font-bold text-brown-900 text-base">Data Guru</h4>
                         <p class="text-xs text-stone-500">Total tercatat: <span id="tableCountGuru" class="font-bold text-brown-800">0</span> guru</p>
                     </div>
-                    <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5">
-                        <button type="button" onclick="bukaModalGtk('guru')" class="px-4 py-2 bg-brown-700 hover:bg-brown-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-plus"></i>
-                            <span>Tambah Data Guru</span>
-                        </button>
-                        <button type="button" onclick="bukaModalImporExcel('guru')" class="px-4 py-2 bg-sky-700 hover:bg-sky-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-file-import"></i>
-                            <span>Impor Excel</span>
-                        </button>
-                        <button type="button" onclick="cetakDataGtk('guru')" class="px-4 py-2 bg-stone-700 hover:bg-stone-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-print"></i>
-                            <span>Cetak</span>
-                        </button>
-                        <button type="button" onclick="exportExcelGtk('guru')" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-file-excel"></i>
-                            <span>Cetak Excel</span>
-                        </button>
-                        <select id="filterStatusGuru" onchange="renderTabelGtk('guru')" class="px-3 py-2 text-sm rounded-xl border border-brown-300 bg-white outline-none focus:border-brown-600">
-                            <option value="">Semua Status</option>
-                            <option value="PNS">PNS</option>
-                            <option value="PPPK">PPPK</option>
-                            <option value="PPPK PW">PPPK PW</option>
-                            <option value="GTT / Honor Sekolah">GTT / Honor Sekolah</option>
-                            <option value="Honor Daerah">Honor Daerah</option>
-                        </select>
-                        <div class="relative">
-                            <input type="text" id="searchGuru" onkeyup="renderTabelGtk('guru')" placeholder="Cari nama / NIP / NIK / jabatan..."
-                                class="w-full sm:w-64 pl-9 pr-4 py-2 text-sm rounded-xl border border-brown-300 outline-none focus:border-brown-600">
-                            <i class="fas fa-search absolute left-3 top-2.5 text-stone-400 text-sm"></i>
+                    <!-- Baris 2: Tombol Aksi & Filter Sejajar Satu Baris -->
+                    <div class="flex items-center justify-between gap-1.5 overflow-x-auto pb-0.5">
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button type="button" onclick="bukaModalGtk('guru')" class="px-2.5 py-1.5 bg-brown-700 hover:bg-brown-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-plus"></i>
+                                <span>Tambah Data Guru</span>
+                            </button>
+                            <button type="button" onclick="bukaModalImporExcel('guru')" class="px-2.5 py-1.5 bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-file-import"></i>
+                                <span>Impor Excel</span>
+                            </button>
+                            <button type="button" onclick="cetakDataGtk('guru')" class="px-2.5 py-1.5 bg-stone-700 hover:bg-stone-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-print"></i>
+                                <span>Cetak</span>
+                            </button>
+                            <button type="button" onclick="exportExcelGtk('guru')" class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-file-excel"></i>
+                                <span>Cetak Excel</span>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <select id="filterStatusGuru" onchange="renderTabelGtk('guru')" class="px-2.5 py-1.5 text-xs rounded-lg border border-brown-300 bg-white outline-none focus:border-brown-600">
+                                <option value="">Semua Status</option>
+                                <option value="PNS">PNS</option>
+                                <option value="PPPK">PPPK</option>
+                                <option value="PPPK PW">PPPK PW</option>
+                                <option value="GTT / Honor Sekolah">GTT / Honor Sekolah</option>
+                                <option value="Honor Daerah">Honor Daerah</option>
+                            </select>
+                            <div class="relative">
+                                <input type="text" id="searchGuru" onkeyup="renderTabelGtk('guru')" placeholder="Cari nama / NIP / NIK / jabatan..."
+                                    class="w-48 xl:w-56 pl-7 pr-3 py-1.5 text-xs rounded-lg border border-brown-300 bg-white outline-none focus:border-brown-600">
+                                <i class="fas fa-search absolute left-2.5 top-2 text-stone-400 text-xs"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1210,40 +1241,46 @@
         <!-- ========================================== -->
         <section id="section-gtk-tendik" class="page-section hidden space-y-6">
             <div class="bg-white rounded-2xl border border-brown-200 shadow-sm overflow-hidden">
-                <div class="p-5 bg-brown-50 border-b border-brown-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div>
-                        <h4 class="font-bold text-brown-900 text-base">Daftar Tendik</h4>
+                <div class="p-4 bg-brown-50 border-b border-brown-200 space-y-2.5">
+                    <!-- Baris 1: Judul & Total Tercatat di atas tabel -->
+                    <div class="flex items-center justify-between gap-2">
+                        <h4 class="font-bold text-brown-900 text-base">Data Tendik</h4>
                         <p class="text-xs text-stone-500">Total tercatat: <span id="tableCountTendik" class="font-bold text-brown-800">0</span> tendik</p>
                     </div>
-                    <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5">
-                        <button type="button" onclick="bukaModalGtk('tendik')" class="px-4 py-2 bg-brown-700 hover:bg-brown-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-plus"></i>
-                            <span>Tambah Data Tendik</span>
-                        </button>
-                        <button type="button" onclick="bukaModalImporExcel('tendik')" class="px-4 py-2 bg-sky-700 hover:bg-sky-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-file-import"></i>
-                            <span>Impor Excel</span>
-                        </button>
-                        <button type="button" onclick="cetakDataGtk('tendik')" class="px-4 py-2 bg-stone-700 hover:bg-stone-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-print"></i>
-                            <span>Cetak</span>
-                        </button>
-                        <button type="button" onclick="exportExcelGtk('tendik')" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-file-excel"></i>
-                            <span>Cetak Excel</span>
-                        </button>
-                        <select id="filterStatusTendik" onchange="renderTabelGtk('tendik')" class="px-3 py-2 text-sm rounded-xl border border-brown-300 bg-white outline-none focus:border-brown-600">
-                            <option value="">Semua Status</option>
-                            <option value="PNS">PNS</option>
-                            <option value="PPPK">PPPK</option>
-                            <option value="PPPK PW">PPPK PW</option>
-                            <option value="PTT / Honor Sekolah">PTT / Honor Sekolah</option>
-                            <option value="Honor Daerah">Honor Daerah</option>
-                        </select>
-                        <div class="relative">
-                            <input type="text" id="searchTendik" onkeyup="renderTabelGtk('tendik')" placeholder="Cari nama / NIP / NIK / jabatan..."
-                                class="w-full sm:w-64 pl-9 pr-4 py-2 text-sm rounded-xl border border-brown-300 outline-none focus:border-brown-600">
-                            <i class="fas fa-search absolute left-3 top-2.5 text-stone-400 text-sm"></i>
+                    <!-- Baris 2: Tombol Aksi & Filter Sejajar Satu Baris -->
+                    <div class="flex items-center justify-between gap-1.5 overflow-x-auto pb-0.5">
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button type="button" onclick="bukaModalGtk('tendik')" class="px-2.5 py-1.5 bg-brown-700 hover:bg-brown-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-plus"></i>
+                                <span>Tambah Data Tendik</span>
+                            </button>
+                            <button type="button" onclick="bukaModalImporExcel('tendik')" class="px-2.5 py-1.5 bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-file-import"></i>
+                                <span>Impor Excel</span>
+                            </button>
+                            <button type="button" onclick="cetakDataGtk('tendik')" class="px-2.5 py-1.5 bg-stone-700 hover:bg-stone-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-print"></i>
+                                <span>Cetak</span>
+                            </button>
+                            <button type="button" onclick="exportExcelGtk('tendik')" class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-file-excel"></i>
+                                <span>Cetak Excel</span>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <select id="filterStatusTendik" onchange="renderTabelGtk('tendik')" class="px-2.5 py-1.5 text-xs rounded-lg border border-brown-300 bg-white outline-none focus:border-brown-600">
+                                <option value="">Semua Status</option>
+                                <option value="PNS">PNS</option>
+                                <option value="PPPK">PPPK</option>
+                                <option value="PPPK PW">PPPK PW</option>
+                                <option value="PTT / Honor Sekolah">PTT / Honor Sekolah</option>
+                                <option value="Honor Daerah">Honor Daerah</option>
+                            </select>
+                            <div class="relative">
+                                <input type="text" id="searchTendik" onkeyup="renderTabelGtk('tendik')" placeholder="Cari nama / NIP / NIK / jabatan..."
+                                    class="w-48 xl:w-56 pl-7 pr-3 py-1.5 text-xs rounded-lg border border-brown-300 bg-white outline-none focus:border-brown-600">
+                                <i class="fas fa-search absolute left-2.5 top-2 text-stone-400 text-xs"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1273,47 +1310,53 @@
         <!-- ========================================== -->
         <section id="section-surat-masuk" class="page-section hidden space-y-6">
             <div class="bg-white rounded-2xl border border-brown-200 shadow-sm overflow-hidden">
-                <div class="p-5 bg-brown-50 border-b border-brown-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div>
-                        <h4 class="font-bold text-brown-900 text-base">Agenda Surat Masuk</h4>
+                <div class="p-4 bg-brown-50 border-b border-brown-200 space-y-2.5">
+                    <!-- Baris 1: Judul & Total Tercatat di atas tabel -->
+                    <div class="flex items-center justify-between gap-2">
+                        <h4 class="font-bold text-brown-900 text-base">Surat Masuk</h4>
                         <p class="text-xs text-stone-500">Total tercatat: <span id="tableCountSuratMasuk" class="font-bold text-brown-800">0</span> surat masuk</p>
                     </div>
-                    <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5">
-                        <button type="button" onclick="bukaModalSurat('masuk')" class="px-4 py-2 bg-brown-700 hover:bg-brown-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-plus"></i>
-                            <span>Tambah Surat Masuk</span>
-                        </button>
-                        <button type="button" onclick="bukaModalImporExcel('surat-masuk')" class="px-4 py-2 bg-sky-700 hover:bg-sky-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-file-import"></i>
-                            <span>Impor Excel</span>
-                        </button>
-                        <button type="button" onclick="cetakDataSurat('masuk')" class="px-4 py-2 bg-stone-700 hover:bg-stone-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-print"></i>
-                            <span>Cetak</span>
-                        </button>
-                        <button type="button" onclick="exportExcelSurat('masuk')" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-file-excel"></i>
-                            <span>Cetak Excel</span>
-                        </button>
-                        <select id="filterTahunSuratMasuk" onchange="ubahFilterSurat('masuk')" class="px-3 py-2 text-sm rounded-xl border border-brown-300 bg-white outline-none focus:border-brown-600 font-medium text-brown-900">
-                            <option value="">Semua Tahun Pelajaran</option>
-                        </select>
-                        <div class="flex flex-wrap items-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-brown-300 text-xs">
-                            <span class="font-bold text-brown-900 whitespace-nowrap"><i class="fas fa-calendar-alt text-brown-600 mr-1"></i>Dari:</span>
-                            <input type="date" id="filterTglDariMasuk" onchange="ubahFilterSurat('masuk')" title="Dari Tanggal"
-                                class="outline-none text-stone-700 font-medium bg-transparent cursor-pointer">
-                            <span class="font-bold text-brown-900 whitespace-nowrap">Ke:</span>
-                            <input type="date" id="filterTglKeMasuk" onchange="ubahFilterSurat('masuk')" title="Ke Tanggal"
-                                class="outline-none text-stone-700 font-medium bg-transparent cursor-pointer">
-                            <button type="button" id="btnResetTglMasuk" onclick="resetFilterTanggalSurat('masuk')" title="Reset Filter Tanggal"
-                                class="hidden px-2 py-0.5 rounded-lg bg-red-100 hover:bg-red-200 text-red-700 font-bold transition">
-                                <i class="fas fa-times"></i>
+                    <!-- Baris 2: Tombol Aksi & Filter Sejajar Satu Baris -->
+                    <div class="flex items-center justify-between gap-1.5 overflow-x-auto pb-0.5">
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button type="button" onclick="bukaModalSurat('masuk')" class="px-2.5 py-1.5 bg-brown-700 hover:bg-brown-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-plus"></i>
+                                <span>Tambah Surat Masuk</span>
+                            </button>
+                            <button type="button" onclick="bukaModalImporExcel('surat-masuk')" class="px-2.5 py-1.5 bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-file-import"></i>
+                                <span>Impor Excel</span>
+                            </button>
+                            <button type="button" onclick="cetakDataSurat('masuk')" class="px-2.5 py-1.5 bg-stone-700 hover:bg-stone-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-print"></i>
+                                <span>Cetak</span>
+                            </button>
+                            <button type="button" onclick="exportExcelSurat('masuk')" class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-file-excel"></i>
+                                <span>Cetak Excel</span>
                             </button>
                         </div>
-                        <div class="relative">
-                            <input type="text" id="searchSuratMasuk" onkeyup="ubahFilterSurat('masuk')" placeholder="Cari no. surat / pengirim / perihal..."
-                                class="w-full sm:w-64 pl-9 pr-4 py-2 text-sm rounded-xl border border-brown-300 outline-none focus:border-brown-600">
-                            <i class="fas fa-search absolute left-3 top-2.5 text-stone-400 text-sm"></i>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <select id="filterTahunSuratMasuk" onchange="ubahFilterSurat('masuk')" class="px-2 py-1.5 text-xs rounded-lg border border-brown-300 bg-white outline-none focus:border-brown-600 font-medium text-brown-900">
+                                <option value="">Semua TP</option>
+                            </select>
+                            <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-brown-300 text-[11px] shrink-0">
+                                <span class="font-bold text-brown-900 whitespace-nowrap"><i class="fas fa-calendar-alt text-brown-600 mr-0.5"></i>Dari:</span>
+                                <input type="date" id="filterTglDariMasuk" onchange="ubahFilterSurat('masuk')" title="Dari Tanggal"
+                                    class="outline-none text-stone-700 font-medium bg-transparent cursor-pointer text-[11px]">
+                                <span class="font-bold text-brown-900 whitespace-nowrap">Ke:</span>
+                                <input type="date" id="filterTglKeMasuk" onchange="ubahFilterSurat('masuk')" title="Ke Tanggal"
+                                    class="outline-none text-stone-700 font-medium bg-transparent cursor-pointer text-[11px]">
+                                <button type="button" id="btnResetTglMasuk" onclick="resetFilterTanggalSurat('masuk')" title="Reset Filter Tanggal"
+                                    class="hidden px-1.5 py-0.5 rounded bg-red-100 hover:bg-red-200 text-red-700 font-bold transition">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="relative">
+                                <input type="text" id="searchSuratMasuk" onkeyup="ubahFilterSurat('masuk')" placeholder="Cari no / pengirim / perihal..."
+                                    class="w-40 xl:w-48 pl-7 pr-2.5 py-1.5 text-xs rounded-lg border border-brown-300 bg-white outline-none focus:border-brown-600">
+                                <i class="fas fa-search absolute left-2.5 top-2 text-stone-400 text-xs"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1369,51 +1412,57 @@
         <!-- ========================================== -->
         <section id="section-surat-keluar" class="page-section hidden space-y-6">
             <div class="bg-white rounded-2xl border border-brown-200 shadow-sm overflow-hidden">
-                <div class="p-5 bg-brown-50 border-b border-brown-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div>
-                        <h4 class="font-bold text-brown-900 text-base">Agenda Surat Keluar</h4>
+                <div class="p-4 bg-brown-50 border-b border-brown-200 space-y-2.5">
+                    <!-- Baris 1: Judul & Total Tercatat di atas tabel -->
+                    <div class="flex items-center justify-between gap-2">
+                        <h4 class="font-bold text-brown-900 text-base">Surat Keluar</h4>
                         <p class="text-xs text-stone-500">Total tercatat: <span id="tableCountSuratKeluar" class="font-bold text-brown-800">0</span> surat keluar</p>
                     </div>
-                    <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5">
-                        <button type="button" onclick="bukaModalSurat('keluar')" class="px-4 py-2 bg-brown-700 hover:bg-brown-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-plus"></i>
-                            <span>Tambah Surat Keluar</span>
-                        </button>
-                        <button type="button" onclick="bukaModalCekNoSuratKeluar()" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-search-plus"></i>
-                            <span>Cek No. Surat</span>
-                        </button>
-                        <button type="button" onclick="bukaModalImporExcel('surat-keluar')" class="px-4 py-2 bg-sky-700 hover:bg-sky-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-file-import"></i>
-                            <span>Impor Excel</span>
-                        </button>
-                        <button type="button" onclick="cetakDataSurat('keluar')" class="px-4 py-2 bg-stone-700 hover:bg-stone-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-print"></i>
-                            <span>Cetak</span>
-                        </button>
-                        <button type="button" onclick="exportExcelSurat('keluar')" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-file-excel"></i>
-                            <span>Cetak Excel</span>
-                        </button>
-                        <select id="filterTahunSuratKeluar" onchange="ubahFilterSurat('keluar')" class="px-3 py-2 text-sm rounded-xl border border-brown-300 bg-white outline-none focus:border-brown-600 font-medium text-brown-900">
-                            <option value="">Semua Tahun Pelajaran</option>
-                        </select>
-                        <div class="flex flex-wrap items-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-brown-300 text-xs">
-                            <span class="font-bold text-brown-900 whitespace-nowrap"><i class="fas fa-calendar-alt text-brown-600 mr-1"></i>Dari:</span>
-                            <input type="date" id="filterTglDariKeluar" onchange="ubahFilterSurat('keluar')" title="Dari Tanggal"
-                                class="outline-none text-stone-700 font-medium bg-transparent cursor-pointer">
-                            <span class="font-bold text-brown-900 whitespace-nowrap">Ke:</span>
-                            <input type="date" id="filterTglKeKeluar" onchange="ubahFilterSurat('keluar')" title="Ke Tanggal"
-                                class="outline-none text-stone-700 font-medium bg-transparent cursor-pointer">
-                            <button type="button" id="btnResetTglKeluar" onclick="resetFilterTanggalSurat('keluar')" title="Reset Filter Tanggal"
-                                class="hidden px-2 py-0.5 rounded-lg bg-red-100 hover:bg-red-200 text-red-700 font-bold transition">
-                                <i class="fas fa-times"></i>
+                    <!-- Baris 2: Tombol Aksi & Filter Sejajar Satu Baris -->
+                    <div class="flex items-center justify-between gap-1.5 overflow-x-auto pb-0.5">
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button type="button" onclick="bukaModalSurat('keluar')" class="px-2.5 py-1.5 bg-brown-700 hover:bg-brown-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-plus"></i>
+                                <span>Tambah Surat Keluar</span>
+                            </button>
+                            <button type="button" onclick="bukaModalCekNoSuratKeluar()" class="px-2.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-search-plus"></i>
+                                <span>Cek No. Surat</span>
+                            </button>
+                            <button type="button" onclick="bukaModalImporExcel('surat-keluar')" class="px-2.5 py-1.5 bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-file-import"></i>
+                                <span>Impor Excel</span>
+                            </button>
+                            <button type="button" onclick="cetakDataSurat('keluar')" class="px-2.5 py-1.5 bg-stone-700 hover:bg-stone-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-print"></i>
+                                <span>Cetak</span>
+                            </button>
+                            <button type="button" onclick="exportExcelSurat('keluar')" class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-file-excel"></i>
+                                <span>Cetak Excel</span>
                             </button>
                         </div>
-                        <div class="relative">
-                            <input type="text" id="searchSuratKeluar" onkeyup="ubahFilterSurat('keluar')" placeholder="Cari no. surat / tujuan / perihal..."
-                                class="w-full sm:w-64 pl-9 pr-4 py-2 text-sm rounded-xl border border-brown-300 outline-none focus:border-brown-600">
-                            <i class="fas fa-search absolute left-3 top-2.5 text-stone-400 text-sm"></i>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <select id="filterTahunSuratKeluar" onchange="ubahFilterSurat('keluar')" class="px-2 py-1.5 text-xs rounded-lg border border-brown-300 bg-white outline-none focus:border-brown-600 font-medium text-brown-900">
+                                <option value="">Semua TP</option>
+                            </select>
+                            <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-brown-300 text-[11px] shrink-0">
+                                <span class="font-bold text-brown-900 whitespace-nowrap"><i class="fas fa-calendar-alt text-brown-600 mr-0.5"></i>Dari:</span>
+                                <input type="date" id="filterTglDariKeluar" onchange="ubahFilterSurat('keluar')" title="Dari Tanggal"
+                                    class="outline-none text-stone-700 font-medium bg-transparent cursor-pointer text-[11px]">
+                                <span class="font-bold text-brown-900 whitespace-nowrap">Ke:</span>
+                                <input type="date" id="filterTglKeKeluar" onchange="ubahFilterSurat('keluar')" title="Ke Tanggal"
+                                    class="outline-none text-stone-700 font-medium bg-transparent cursor-pointer text-[11px]">
+                                <button type="button" id="btnResetTglKeluar" onclick="resetFilterTanggalSurat('keluar')" title="Reset Filter Tanggal"
+                                    class="hidden px-1.5 py-0.5 rounded bg-red-100 hover:bg-red-200 text-red-700 font-bold transition">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="relative">
+                                <input type="text" id="searchSuratKeluar" onkeyup="ubahFilterSurat('keluar')" placeholder="Cari no / tujuan / perihal..."
+                                    class="w-36 xl:w-44 pl-7 pr-2.5 py-1.5 text-xs rounded-lg border border-brown-300 bg-white outline-none focus:border-brown-600">
+                                <i class="fas fa-search absolute left-2.5 top-2 text-stone-400 text-xs"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1469,28 +1518,34 @@
         <!-- ========================================== -->
         <section id="section-surat-menerima" class="page-section hidden space-y-6">
             <div class="bg-white rounded-2xl border border-brown-200 shadow-sm overflow-hidden">
-                <div class="p-5 bg-brown-50 border-b border-brown-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div>
+                <div class="p-4 bg-brown-50 border-b border-brown-200 space-y-2.5">
+                    <!-- Baris 1: Judul & Total Tercatat di atas tabel -->
+                    <div class="flex items-center justify-between gap-2">
                         <h4 class="font-bold text-brown-900 text-base">Daftar Surat Bersedia Menerima Siswa Pindahan</h4>
                         <p class="text-xs text-stone-500">Total tercatat: <span id="tableCountSuratMenerima" class="font-bold text-brown-800">0</span> surat menerima</p>
                     </div>
-                    <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5">
-                        <button type="button" onclick="bukaModalSuratMenerima()" class="px-4 py-2 bg-brown-700 hover:bg-brown-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-plus"></i>
-                            <span>Tambah Surat Menerima</span>
-                        </button>
-                        <button type="button" onclick="cetakRekapSuratMenerima()" class="px-4 py-2 bg-stone-700 hover:bg-stone-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-print"></i>
-                            <span>Cetak</span>
-                        </button>
-                        <button type="button" onclick="exportExcelSuratMenerima()" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-file-excel"></i>
-                            <span>Cetak Excel</span>
-                        </button>
-                        <div class="relative">
-                            <input type="text" id="searchSuratMenerima" onkeyup="renderTabelSuratMenerima()" placeholder="Cari no. surat / nama siswa / NISN..."
-                                class="w-full sm:w-64 pl-9 pr-4 py-2 text-sm rounded-xl border border-brown-300 outline-none focus:border-brown-600">
-                            <i class="fas fa-search absolute left-3 top-2.5 text-stone-400 text-sm"></i>
+                    <!-- Baris 2: Tombol Aksi & Pencarian Sejajar Satu Baris -->
+                    <div class="flex items-center justify-between gap-1.5 overflow-x-auto pb-0.5">
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button type="button" onclick="bukaModalSuratMenerima()" class="px-2.5 py-1.5 bg-brown-700 hover:bg-brown-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-plus"></i>
+                                <span>Tambah Surat Menerima</span>
+                            </button>
+                            <button type="button" onclick="cetakRekapSuratMenerima()" class="px-2.5 py-1.5 bg-stone-700 hover:bg-stone-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-print"></i>
+                                <span>Cetak</span>
+                            </button>
+                            <button type="button" onclick="exportExcelSuratMenerima()" class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-lg shadow-xs transition inline-flex items-center space-x-1 whitespace-nowrap">
+                                <i class="fas fa-file-excel"></i>
+                                <span>Cetak Excel</span>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <div class="relative">
+                                <input type="text" id="searchSuratMenerima" onkeyup="renderTabelSuratMenerima()" placeholder="Cari no. surat / nama siswa / NISN..."
+                                    class="w-56 xl:w-64 pl-7 pr-3 py-1.5 text-xs rounded-lg border border-brown-300 bg-white outline-none focus:border-brown-600">
+                                <i class="fas fa-search absolute left-2.5 top-2 text-stone-400 text-xs"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2830,6 +2885,10 @@
     let idSiswaHapus = null;
     let isSyncingCloud = false;
     let pendingCloudSync = false;
+    let modulTertundaCloud = new Set();
+    let timerDebounceSync = null;
+    let statusJaringanOnline = navigator.onLine;
+    let adaPerubahanTertundaOffline = false;
 
     // Inisialisasi saat halaman dimuat
     document.addEventListener('DOMContentLoaded', () => {
@@ -2837,12 +2896,97 @@
         localStorage.removeItem(KEY_AUTH_SESSION);
         sessionStorage.removeItem(KEY_AUTH_SESSION);
 
+        inisialisasiPemantauJaringan();
         inisialisasiPwaAdmops();
         tampilkanTanggal();
         muatDataDariStorage();
         segarkanSemuaTampilan();
         cekStatusLogin();
     });
+
+    // ==========================================
+    // PEMANTAU STATUS JARINGAN (ONLINE / OFFLINE)
+    // ==========================================
+    function inisialisasiPemantauJaringan() {
+        perbaruiTampilanStatusJaringan(navigator.onLine, false);
+
+        window.addEventListener('online', () => {
+            perbaruiTampilanStatusJaringan(true, true);
+        });
+
+        window.addEventListener('offline', () => {
+            perbaruiTampilanStatusJaringan(false, true);
+        });
+    }
+
+    function perbaruiTampilanStatusJaringan(isOnline, tampilkanNotif = false) {
+        const sebelumnyaOnline = statusJaringanOnline;
+        statusJaringanOnline = Boolean(isOnline);
+
+        const badge = document.getElementById('networkStatusBadge');
+        const dot = document.getElementById('networkStatusDot');
+        const text = document.getElementById('networkStatusText');
+        const banner = document.getElementById('offlineAlertBanner');
+
+        if (statusJaringanOnline) {
+            if (badge && dot && text) {
+                badge.className = 'inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs transition';
+                dot.className = 'w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse';
+                text.textContent = 'Online';
+            }
+            if (banner) banner.classList.add('hidden');
+            setStatusCloudBadge('synced', 'Tersinkron');
+
+            if (tampilkanNotif && !sebelumnyaOnline) {
+                tampilkanToast('Jaringan pulih kembali! Aplikasi otomatis kembali Online.', 'success');
+                if (adaPerubahanTertundaOffline || pendingCloudSync) {
+                    adaPerubahanTertundaOffline = false;
+                    kirimSemuaKeGoogleSheet(true);
+                }
+            }
+        } else {
+            if (badge && dot && text) {
+                badge.className = 'inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-300 shadow-2xs transition';
+                dot.className = 'w-2 h-2 rounded-full bg-red-600 mr-2';
+                text.textContent = 'Offline';
+            }
+            if (banner) banner.classList.remove('hidden');
+            setStatusCloudBadge('error', 'Mode Offline');
+
+            if (tampilkanNotif && sebelumnyaOnline) {
+                tampilkanToast('Gangguan jaringan! Periksa jaringan Anda (Mode Offline).', 'warning');
+            }
+        }
+    }
+
+    async function periksaKoneksiJaringan(manualKlik = false) {
+        if (!navigator.onLine) {
+            perbaruiTampilanStatusJaringan(false, false);
+            if (manualKlik) {
+                tampilkanToast('Masih Offline. Periksa koneksi Wi-Fi atau data seluler Anda!', 'warning');
+            }
+            return false;
+        }
+
+        try {
+            await fetch(`${GAS_WEB_APP_URL}?action=ping&t=${Date.now()}`, {
+                method: 'GET',
+                mode: 'no-cors',
+                cache: 'no-store'
+            });
+            perbaruiTampilanStatusJaringan(true, true);
+            if (manualKlik) {
+                tampilkanToast('Koneksi internet aktif dan terhubung ke server (Online)!');
+            }
+            return true;
+        } catch (err) {
+            perbaruiTampilanStatusJaringan(false, true);
+            if (manualKlik) {
+                tampilkanToast('Gangguan jaringan! Periksa jaringan Anda.', 'warning');
+            }
+            return false;
+        }
+    }
 
     function segarkanSemuaTampilan() {
         updateTampilanBeranda();
@@ -2893,39 +3037,53 @@
         localStorage.setItem(KEY_SURAT_MENERIMA, JSON.stringify(daftarSuratMenerima));
     }
 
-    function bangunPayloadUntukGoogleSheet() {
-        // Sesuaikan pemetaan field dengan struktur Google Apps Script backend
-        const pdKeluarMapped = daftarSiswaKeluar.map(s => ({
-            ...s,
-            mutasi: s.mutasi || {
-                jenis: s.jenisKeluar || 'Mutasi (Pindah Sekolah)',
-                tahunKeluar: s.tahunKeluar || '',
-                tanggalKeluar: s.tanggalKeluar || '',
-                alasan: s.alasan || '',
-                sekolahTujuan: s.sekolahTujuan || '-',
-                kecamatan: s.kecamatan || '-',
-                kabupaten: s.kabupaten || '-',
-                provinsi: s.provinsi || '-',
-                noSurat: s.noSurat || '-'
-            }
-        }));
+    function ambilDataSatuModul(namaModul) {
+        switch (namaModul) {
+            case 'sekolah':
+                return dataSekolah;
+            case 'pdAktif':
+                return daftarSiswa;
+            case 'pdKeluar':
+                return daftarSiswaKeluar.map(s => ({
+                    ...s,
+                    mutasi: s.mutasi || {
+                        jenis: s.jenisKeluar || 'Mutasi (Pindah Sekolah)',
+                        tahunKeluar: s.tahunKeluar || '',
+                        tanggalKeluar: s.tanggalKeluar || '',
+                        alasan: s.alasan || '',
+                        sekolahTujuan: s.sekolahTujuan || '-',
+                        kecamatan: s.kecamatan || '-',
+                        kabupaten: s.kabupaten || '-',
+                        provinsi: s.provinsi || '-',
+                        noSurat: s.noSurat || '-'
+                    }
+                }));
+            case 'dataNis':
+                return daftarNis.map(n => ({ ...n, nis: n.nomor || n.nis || '' }));
+            case 'guru':
+                return daftarGuru;
+            case 'tendik':
+                return daftarTendik;
+            case 'suratMasuk':
+                return daftarSuratMasuk;
+            case 'suratKeluar':
+                return daftarSuratKeluar;
+            case 'suratMenerima':
+                return daftarSuratMenerima;
+            default:
+                return null;
+        }
+    }
 
-        const dataNisMapped = daftarNis.map(n => ({
-            ...n,
-            nis: n.nomor || n.nis || ''
-        }));
-
-        return {
-            sekolah: dataSekolah,
-            pdAktif: daftarSiswa,
-            pdKeluar: pdKeluarMapped,
-            dataNis: dataNisMapped,
-            guru: daftarGuru,
-            tendik: daftarTendik,
-            suratMasuk: daftarSuratMasuk,
-            suratKeluar: daftarSuratKeluar,
-            suratMenerima: daftarSuratMenerima
-        };
+    function bangunPayloadUntukGoogleSheet(daftarModul = null) {
+        const semuaModul = ['sekolah', 'pdAktif', 'pdKeluar', 'dataNis', 'guru', 'tendik', 'suratMasuk', 'suratKeluar', 'suratMenerima'];
+        const target = (Array.isArray(daftarModul) && daftarModul.length > 0) ? daftarModul : semuaModul;
+        const hasil = {};
+        target.forEach(m => {
+            const val = ambilDataSatuModul(m);
+            if (val !== null) hasil[m] = val;
+        });
+        return hasil;
     }
 
     function terapkanDataDariGoogleSheet(cloudData) {
@@ -3003,7 +3161,14 @@
 
     async function tarikDataDariGoogleSheet(tampilkanNotif = false) {
         if (!GAS_WEB_APP_URL) return false;
-        setStatusCloudBadge('syncing', 'Menyingkron...');
+        if (!navigator.onLine) {
+            perbaruiTampilanStatusJaringan(false, false);
+            if (tampilkanNotif) {
+                tampilkanToast('Periksa jaringan Anda! Aplikasi sedang Offline.', 'warning');
+            }
+            return false;
+        }
+        setStatusCloudBadge('syncing', 'Mengunduh...');
 
         try {
             const url = `${GAS_WEB_APP_URL}?action=getAll&t=${Date.now()}`;
@@ -3016,62 +3181,104 @@
             if (payloadData && typeof payloadData === 'object') {
                 terapkanDataDariGoogleSheet(payloadData);
                 segarkanSemuaTampilan();
+                perbaruiTampilanStatusJaringan(true, false);
                 setStatusCloudBadge('synced', 'Tersinkron');
                 if (tampilkanNotif) {
-                    tampilkanToast('Data terbaru berhasil disinkronkan!');
+                    tampilkanToast('Berhasil Singkron');
                 }
                 return true;
             }
             throw new Error('Format respons tidak valid');
         } catch (err) {
             console.warn('Gagal mengambil data dari Google Sheet:', err);
-            setStatusCloudBadge('error', 'Offline / Gagal');
+            if (!navigator.onLine) {
+                perbaruiTampilanStatusJaringan(false, true);
+            } else {
+                setStatusCloudBadge('error', 'Gangguan Jaringan');
+            }
             if (tampilkanNotif) {
-                tampilkanToast('Gagal terhubung ke Google Sheet. Menampilkan data lokal.', 'warning');
+                tampilkanToast('Periksa jaringan Anda! Gagal terhubung ke Google Sheet (Offline).', 'warning');
             }
             return false;
         }
     }
 
-    async function kirimSemuaKeGoogleSheet(tampilkanNotif = false) {
+    async function kirimSemuaKeGoogleSheet(tampilkanNotif = false, modulSpesifik = null) {
         if (!GAS_WEB_APP_URL) return false;
+
+        if (!navigator.onLine) {
+            adaPerubahanTertundaOffline = true;
+            if (Array.isArray(modulSpesifik)) modulSpesifik.forEach(m => modulTertundaCloud.add(m));
+            else if (typeof modulSpesifik === 'string') modulTertundaCloud.add(modulSpesifik);
+            else modulTertundaCloud.add('ALL');
+
+            perbaruiTampilanStatusJaringan(false, true);
+            if (tampilkanNotif) {
+                tampilkanToast('Periksa jaringan Anda! Data disimpan lokal & akan dikirim otomatis saat Online.', 'warning');
+            }
+            return false;
+        }
+
+        // Kumpulkan modul yang berubah agar pengiriman bisa digabung cepat (debounce 120ms)
+        if (Array.isArray(modulSpesifik)) modulSpesifik.forEach(m => modulTertundaCloud.add(m));
+        else if (typeof modulSpesifik === 'string') modulTertundaCloud.add(modulSpesifik);
+        else modulTertundaCloud.add('ALL');
 
         if (isSyncingCloud) {
             pendingCloudSync = true;
             return false;
         }
 
-        isSyncingCloud = true;
-        setStatusCloudBadge('syncing', 'Menyimpan...');
+        if (timerDebounceSync) clearTimeout(timerDebounceSync);
+        return new Promise((resolve) => {
+            timerDebounceSync = setTimeout(async () => {
+                timerDebounceSync = null;
+                const daftarKirim = modulTertundaCloud.has('ALL') ? null : Array.from(modulTertundaCloud);
+                modulTertundaCloud.clear();
 
-        try {
-            const payload = bangunPayloadUntukGoogleSheet();
-            await fetch(GAS_WEB_APP_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'syncAll', data: payload })
-            });
+                isSyncingCloud = true;
+                setStatusCloudBadge('syncing', 'Menyimpan...');
 
-            setStatusCloudBadge('synced', 'Tersinkron');
-            if (tampilkanNotif) {
-                tampilkanToast('Seluruh perubahan berhasil dikirim ke Google Sheet!');
-            }
-            return true;
-        } catch (err) {
-            console.warn('Gagal menyinkronkan ke Google Sheet:', err);
-            setStatusCloudBadge('error', 'Gagal Sync');
-            if (tampilkanNotif) {
-                tampilkanToast('Gagal mengirim data ke Google Sheet.', 'warning');
-            }
-            return false;
-        } finally {
-            isSyncingCloud = false;
-            if (pendingCloudSync) {
-                pendingCloudSync = false;
-                kirimSemuaKeGoogleSheet(false);
-            }
-        }
+                try {
+                    const payload = bangunPayloadUntukGoogleSheet(daftarKirim);
+                    const bodyJson = JSON.stringify({
+                        action: daftarKirim ? 'syncPartial' : 'syncAll',
+                        modules: daftarKirim || 'ALL',
+                        data: payload
+                    });
+
+                    await fetch(GAS_WEB_APP_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        keepalive: true,
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: bodyJson
+                    });
+
+                    perbaruiTampilanStatusJaringan(true, false);
+                    setStatusCloudBadge('synced', 'Tersinkron');
+                    if (tampilkanNotif) {
+                        tampilkanToast('Seluruh perubahan berhasil dikirim ke Google Sheet!');
+                    }
+                    resolve(true);
+                } catch (err) {
+                    console.warn('Gagal menyinkronkan ke Google Sheet:', err);
+                    adaPerubahanTertundaOffline = true;
+                    perbaruiTampilanStatusJaringan(false, true);
+                    setStatusCloudBadge('error', 'Mode Offline');
+                    if (tampilkanNotif) {
+                        tampilkanToast('Periksa jaringan Anda! Gagal mengirim data ke Google Sheet.', 'warning');
+                    }
+                    resolve(false);
+                } finally {
+                    isSyncingCloud = false;
+                    if (pendingCloudSync && navigator.onLine) {
+                        pendingCloudSync = false;
+                        kirimSemuaKeGoogleSheet(false, Array.from(modulTertundaCloud));
+                    }
+                }
+            }, 120);
+        });
     }
 
     async function jalankanAnimasiLoginDanMuatData(dariSesiTersimpan = false) {
@@ -3141,7 +3348,7 @@
             } else if (p < 100) {
                 setStatusBadgeLogin('stepBadge-suratKeluar', 'done');
                 if (!fetchSelesai) {
-                    stepTextEl.textContent = 'Menyelesaikan Data....';
+                    stepTextEl.textContent = 'Menyelesaikan Data';
                 } else {
                     stepTextEl.textContent = 'Menyiapkan Surat Bersedia Menerima...';
                 }
@@ -3196,84 +3403,24 @@
 
         if (!dariSesiTersimpan) {
             if (hasilFetchSukses) {
-                tampilkanToast('Login berhasil!');
+                tampilkanToast('Berhasil Login');
             } else {
-                tampilkanToast('Login berhasil! Menampilkan data tersimpan di perangkat.', 'warning');
+                tampilkanToast('Berhasil Login', 'warning');
             }
         }
     }
 
-    async function sinkronisasiManualGoogleSheet() {
-        await tarikDataDariGoogleSheet(true);
-    }
-
-    // ==========================================
-    // LOGIKA PWA & INSTAL APLIKASI (CHROME / EDGE)
-    // ==========================================
     let deferredInstallPrompt = null;
 
     function inisialisasiPwaAdmops() {
-        // Perbarui start_url manifest dinamis sesuai URL halaman saat ini agar Chrome & Edge mengenali PWA valid
-        try {
-            const manifestObj = {
-                default_locale: 'id',
-                name: 'ADMOPS - Administrasi OPS SDN 22 Tanah Keras',
-                short_name: 'ADMOPS',
-                description: 'Sistem Administrasi Operator Sekolah SDN 22 Tanah Keras',
-                start_url: window.location.href,
-                scope: './',
-                display: 'standalone',
-                orientation: 'any',
-                background_color: '#43302b',
-                theme_color: '#43302b',
-                icons: [
-                    {
-                        src: 'https://iili.io/o2tZpkv.th.png',
-                        sizes: '192x192',
-                        type: 'image/png',
-                        purpose: 'any maskable'
-                    },
-                    {
-                        src: 'https://iili.io/o2tZpkv.th.png',
-                        sizes: '512x512',
-                        type: 'image/png',
-                        purpose: 'any maskable'
-                    }
-                ]
-            };
-            const blobManifest = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
-            const manifestUrl = URL.createObjectURL(blobManifest);
-            const linkEl = document.getElementById('pwaManifestLink');
-            if (linkEl) linkEl.setAttribute('href', manifestUrl);
-        } catch (err) {
-            // Fallback tetap menggunakan data URI manifest di tag <head>
-        }
-
-        // Daftarkan Service Worker minimal berbasis Blob agar syarat installability Chrome/Edge terpenuhi jika dijalankan via HTTPS/localhost
-        if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
-            try {
-                const swCode = `
-                    self.addEventListener('install', (e) => self.skipWaiting());
-                    self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
-                    self.addEventListener('fetch', (e) => {});
-                `;
-                const swBlob = new Blob([swCode], { type: 'application/javascript' });
-                const swUrl = URL.createObjectURL(swBlob);
-                navigator.serviceWorker.register(swUrl).catch(() => {});
-            } catch (e) {}
-        }
-
-        // Tangkap event beforeinstallprompt dari Chrome / Edge
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredInstallPrompt = e;
         });
+    }
 
-        window.addEventListener('appinstalled', () => {
-            deferredInstallPrompt = null;
-            tutupModalPanduanInstal();
-            tampilkanToast('Aplikasi ADMOPS berhasil diinstal ke perangkat Anda!');
-        });
+    function sinkronisasiManualGoogleSheet() {
+        tarikDataDariGoogleSheet(true);
     }
 
     async function instalAplikasiAdmops() {
@@ -3458,8 +3605,14 @@
             sidebar.classList.toggle('-translate-x-full');
             if (overlay) overlay.classList.toggle('hidden');
         } else {
-            sidebar.classList.toggle('lg:w-64');
-            sidebar.classList.toggle('lg:w-0');
+            const sedangTersembunyi = sidebar.classList.contains('lg:w-0');
+            if (sedangTersembunyi) {
+                sidebar.classList.remove('lg:w-0', 'w-0');
+                sidebar.classList.add('w-64', 'lg:w-64');
+            } else {
+                sidebar.classList.remove('w-64', 'lg:w-64');
+                sidebar.classList.add('w-0', 'lg:w-0');
+            }
         }
     }
 
@@ -3674,7 +3827,7 @@
         tutupFormSiswa();
         renderTabelSiswa();
         updateTampilanBeranda();
-        kirimSemuaKeGoogleSheet(false);
+        kirimSemuaKeGoogleSheet(false, 'pdAktif');
     }
 
     function editSiswa(id) {
@@ -3719,7 +3872,7 @@
                 updateTampilanBeranda();
                 tutupModalHapus();
                 tampilkanToast(`Data peserta didik "${siswa.nama}" berhasil dihapus.`, 'danger');
-                kirimSemuaKeGoogleSheet(false);
+                kirimSemuaKeGoogleSheet(false, 'pdAktif');
             }
         });
     }
@@ -4111,7 +4264,7 @@
         renderTabelSiswaKeluar();
         updateTampilanBeranda();
         tampilkanToast(`Siswa "${siswa.nama}" berhasil dipindahkan ke PD Keluar!`);
-        kirimSemuaKeGoogleSheet(false);
+        kirimSemuaKeGoogleSheet(false, ['pdAktif', 'pdKeluar']);
     }
 
     function getFilteredSiswaKeluar() {
@@ -4217,7 +4370,7 @@
                 updateTampilanBeranda();
                 tutupModalHapus();
                 tampilkanToast(`Siswa "${siswa.nama}" berhasil dikembalikan ke PD Aktif!`);
-                kirimSemuaKeGoogleSheet(false);
+                kirimSemuaKeGoogleSheet(false, ['pdAktif', 'pdKeluar']);
             }
         });
     }
@@ -4236,25 +4389,7 @@
                 updateTampilanBeranda();
                 tutupModalHapus();
                 tampilkanToast(`Data PD Keluar "${siswa.nama}" berhasil dihapus.`, 'danger');
-                kirimSemuaKeGoogleSheet(false);
-            }
-        });
-    }
-
-    function konfirmasiHapusSiswaKeluar(id) {
-        const siswa = daftarSiswaKeluar.find(s => s.id === id);
-        if (!siswa) return;
-
-        bukaModalKonfirmasiHapus({
-            judul: 'Hapus Data PD Keluar?',
-            namaTarget: siswa.nama,
-            onConfirm: () => {
-                daftarSiswaKeluar = daftarSiswaKeluar.filter(s => s.id !== id);
-                localStorage.setItem(KEY_SISWA_KELUAR, JSON.stringify(daftarSiswaKeluar));
-                renderTabelSiswaKeluar();
-                updateTampilanBeranda();
-                tutupModalHapus();
-                tampilkanToast(`Data PD Keluar "${siswa.nama}" berhasil dihapus.`, 'danger');
+                kirimSemuaKeGoogleSheet(false, 'pdKeluar');
             }
         });
     }
@@ -4395,7 +4530,7 @@
         renderTabelSurat('keluar');
         updateTampilanBeranda();
         tampilkanToast('Nomor surat berhasil dikirim ke Agenda Surat Keluar!');
-        kirimSemuaKeGoogleSheet(false);
+        kirimSemuaKeGoogleSheet(false, 'suratKeluar');
     }
 
     function prosesCetakSuratAktif(e) {
@@ -4514,7 +4649,7 @@
         renderTabelSurat('keluar');
         updateTampilanBeranda();
         tampilkanToast('Surat Pindah berhasil dikirim ke Agenda Surat Keluar!');
-        kirimSemuaKeGoogleSheet(false);
+        kirimSemuaKeGoogleSheet(false, 'suratKeluar');
     }
 
     function prosesCetakSuratPindah(e) {
@@ -4777,7 +4912,7 @@
         localStorage.setItem(KEY_SEKOLAH, JSON.stringify(dataSekolah));
         updateTampilanBeranda();
         tampilkanToast('Data sekolah berhasil disimpan!');
-        kirimSemuaKeGoogleSheet(false);
+        kirimSemuaKeGoogleSheet(false, 'sekolah');
     }
 
     function updateTampilanBeranda() {
@@ -4917,7 +5052,7 @@
         localStorage.setItem(KEY_DATA_NIS, JSON.stringify(daftarNis));
         tutupModalNis();
         renderTabelNis();
-        kirimSemuaKeGoogleSheet(false);
+        kirimSemuaKeGoogleSheet(false, 'dataNis');
     }
 
     function konfirmasiHapusNis(id) {
@@ -4932,7 +5067,7 @@
                 renderTabelNis();
                 tutupModalHapus();
                 tampilkanToast('Data NIS berhasil dihapus.', 'danger');
-                kirimSemuaKeGoogleSheet(false);
+                kirimSemuaKeGoogleSheet(false, 'dataNis');
             }
         });
     }
@@ -5190,7 +5325,7 @@
         renderTabelGtk(kategori);
         updateTampilanBeranda();
         tampilkanToast(`Data ${kategori === 'guru' ? 'Guru' : 'Tendik'} berhasil disimpan!`);
-        kirimSemuaKeGoogleSheet(false);
+        kirimSemuaKeGoogleSheet(false, kategori === 'guru' ? 'guru' : 'tendik');
     }
 
     function konfirmasiHapusGtk(kategori, id) {
@@ -5212,7 +5347,7 @@
                 updateTampilanBeranda();
                 tutupModalHapus();
                 tampilkanToast('Data pegawai berhasil dihapus.', 'danger');
-                kirimSemuaKeGoogleSheet(false);
+                kirimSemuaKeGoogleSheet(false, kategori === 'guru' ? 'guru' : 'tendik');
             }
         });
     }
@@ -5487,7 +5622,7 @@
         renderTabelSurat(jenis);
         updateTampilanBeranda();
         tampilkanToast(`Data Surat ${jenis === 'masuk' ? 'Masuk' : 'Keluar'} berhasil disimpan!`);
-        kirimSemuaKeGoogleSheet(false);
+        kirimSemuaKeGoogleSheet(false, jenis === 'masuk' ? 'suratMasuk' : 'suratKeluar');
     }
 
     function konfirmasiHapusSurat(jenis, id) {
@@ -5509,7 +5644,7 @@
                 updateTampilanBeranda();
                 tutupModalHapus();
                 tampilkanToast('Agenda surat berhasil dihapus.', 'danger');
-                kirimSemuaKeGoogleSheet(false);
+                kirimSemuaKeGoogleSheet(false, jenis === 'masuk' ? 'suratMasuk' : 'suratKeluar');
             }
         });
     }
@@ -5830,7 +5965,7 @@
         renderTabelSuratMenerima();
         updateTampilanBeranda();
         tampilkanToast('Surat Bersedia Menerima berhasil disimpan!');
-        kirimSemuaKeGoogleSheet(false);
+        kirimSemuaKeGoogleSheet(false, 'suratMenerima');
     }
 
     function konfirmasiHapusSuratMenerima(id) {
@@ -5846,7 +5981,7 @@
                 updateTampilanBeranda();
                 tutupModalHapus();
                 tampilkanToast('Surat Menerima berhasil dihapus.', 'danger');
-                kirimSemuaKeGoogleSheet(false);
+                kirimSemuaKeGoogleSheet(false, 'suratMenerima');
             }
         });
     }
@@ -5941,7 +6076,7 @@
         renderTabelSurat('keluar');
         updateTampilanBeranda();
         tampilkanToast(`Surat Bersedia Menerima (${s.nomor}) berhasil dikirim ke Surat Keluar!`);
-        kirimSemuaKeGoogleSheet(false);
+        kirimSemuaKeGoogleSheet(false, 'suratKeluar');
     }
 
     function cetakSuratMenerimaIndividu(id) {
@@ -6269,7 +6404,7 @@
         renderTabelSiswa();
         renderTabelSiswaKeluar();
         updateTampilanBeranda();
-        kirimSemuaKeGoogleSheet(false);
+        kirimSemuaKeGoogleSheet(false, kelasAsal === 'Kelas 6' ? ['sekolah', 'pdAktif', 'pdKeluar'] : ['sekolah', 'pdAktif']);
     }
 
     // ==========================================
@@ -6534,7 +6669,15 @@
         updateTampilanBeranda();
         tutupModalImporExcel();
         tampilkanToast(`Berhasil mengimpor ${jumlah} baris data dari Excel!`);
-        kirimSemuaKeGoogleSheet(false);
+        const petaModulImpor = {
+            siswa: 'pdAktif',
+            nis: 'dataNis',
+            guru: 'guru',
+            tendik: 'tendik',
+            'surat-masuk': 'suratMasuk',
+            'surat-keluar': 'suratKeluar'
+        };
+        kirimSemuaKeGoogleSheet(false, petaModulImpor[jenis] || null);
     }
 
     function buatHtmlKopSurat() {
