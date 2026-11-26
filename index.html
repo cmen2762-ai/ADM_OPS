@@ -560,7 +560,7 @@
                         </div>
                     </div>
 
-                    <!--  -->
+                    <!-- Asisten AI Surat -->
                     <button id="nav-ai-surat" onclick="navigate('ai-surat')" class="nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-brown-100 hover:bg-brown-700/70 hover:text-white transition">
                         <div class="flex items-center space-x-3">
                             <i class="fas fa-robot w-5 text-center text-amber-300"></i>
@@ -1709,6 +1709,11 @@
                             <h4 class="font-bold text-brown-900 text-sm">Pratinjau Dokumen Surat (Siap Cetak)</h4>
                         </div>
                         <div class="flex flex-wrap items-center gap-1.5">
+                            <button type="button" onclick="bersihkanPratinjauSuratAi()" title="Bersihkan Isi Pratinjau Surat"
+                                class="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 text-xs font-bold rounded-lg transition inline-flex items-center space-x-1">
+                                <i class="fas fa-eraser"></i>
+                                <span>Bersihkan</span>
+                            </button>
                             <button type="button" onclick="salinIsiSuratAi()" title="Salin Teks Isi Surat"
                                 class="px-3 py-1.5 bg-stone-200 hover:bg-stone-300 text-stone-800 text-xs font-bold rounded-lg transition inline-flex items-center space-x-1">
                                 <i class="fas fa-copy"></i>
@@ -6736,6 +6741,17 @@ ATURAN OUTPUT:
                 <p>Pilih jenis surat, tuliskan perintah di formulir sebelah kiri, lalu klik <strong>Generate Surat Sekarang</strong>.<br>Anda juga dapat mengedit langsung isi surat di kertas ini sebelum mencetak.</p>
             </div>
         `;
+    }
+
+    function bersihkanPratinjauSuratAi() {
+        const previewEl = document.getElementById('isiSuratHasilAi');
+        const teks = (previewEl?.innerText || '').trim();
+        if (!teks || teks.includes('Belum Ada Surat yang Di-generate')) {
+            tampilkanToast('Area pratinjau surat sudah kosong.', 'warning');
+            return;
+        }
+        resetPratinjauSuratAiKosong();
+        tampilkanToast('Pratinjau surat dibersihkan. Silakan generate ulang surat.');
     }
 
     function kirimSuratAiKeSuratKeluar() {
