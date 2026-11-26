@@ -560,7 +560,7 @@
                         </div>
                     </div>
 
-                    <!-- Asisten AI Surat -->
+                    <!--  -->
                     <button id="nav-ai-surat" onclick="navigate('ai-surat')" class="nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-brown-100 hover:bg-brown-700/70 hover:text-white transition">
                         <div class="flex items-center space-x-3">
                             <i class="fas fa-robot w-5 text-center text-amber-300"></i>
@@ -3041,6 +3041,75 @@
 </div>
 
 <!-- ========================================== -->
+<!-- MODAL PILIHAN ORIENTASI CETAK (POTRET / LANSKAP) -->
+<!-- ========================================== -->
+<div id="modalPilihOrientasiCetak" class="ios-modal-backdrop fixed inset-0 z-50 hidden items-center justify-center bg-stone-900/60 backdrop-blur-xs p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-brown-200 overflow-hidden my-auto">
+        <div class="px-6 py-4 bg-brown-900 text-white flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-400/20 border border-amber-300/40 flex items-center justify-center text-amber-300 shrink-0">
+                    <i class="fas fa-print text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold tracking-tight">Pengaturan Orientasi Cetak / PDF</h3>
+                    <p class="text-xs text-brown-200 truncate max-w-[230px]" id="orientasiCetakSubtitle">Pilih posisi kertas sebelum mencetak</p>
+                </div>
+            </div>
+            <button type="button" onclick="tutupModalOrientasiCetak()" title="Tutup" class="w-8 h-8 rounded-xl text-brown-200 hover:bg-brown-800 hover:text-white flex items-center justify-center transition">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="p-6 space-y-4">
+            <p class="text-xs text-stone-600 leading-relaxed">
+                Pilih orientasi kertas untuk mencetak langsung ke printer atau menyimpan sebagai <strong>PDF</strong>:
+            </p>
+
+            <div class="grid grid-cols-2 gap-3.5">
+                <!-- Pilihan Potret (Portrait) -->
+                <button type="button" id="btnPilihPotret" onclick="pilihOrientasiCetak('portrait')"
+                    class="p-4 rounded-2xl border-2 border-brown-700 bg-brown-50/80 text-brown-950 flex flex-col items-center justify-center space-y-2.5 transition shadow-xs hover:bg-brown-100/70">
+                    <div class="w-10 h-14 rounded-lg border-2 border-current bg-white flex flex-col justify-center items-center p-1.5 shadow-2xs">
+                        <span class="w-full h-0.5 bg-current opacity-40 mb-1"></span>
+                        <span class="w-full h-0.5 bg-current opacity-40 mb-1"></span>
+                        <span class="w-3/4 h-0.5 bg-current opacity-40 self-start"></span>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-sm font-extrabold">Potret</div>
+                        <div class="text-[11px] text-stone-500 font-medium">Tegak (Portrait)</div>
+                    </div>
+                </button>
+
+                <!-- Pilihan Lanskap (Landscape) -->
+                <button type="button" id="btnPilihLanskap" onclick="pilihOrientasiCetak('landscape')"
+                    class="p-4 rounded-2xl border-2 border-stone-200 bg-white text-stone-700 flex flex-col items-center justify-center space-y-2.5 transition hover:border-brown-400 hover:bg-brown-50/40">
+                    <div class="w-14 h-10 rounded-lg border-2 border-current bg-white flex flex-col justify-center items-center p-1.5 shadow-2xs my-2">
+                        <span class="w-full h-0.5 bg-current opacity-40 mb-1"></span>
+                        <span class="w-full h-0.5 bg-current opacity-40 mb-1"></span>
+                        <span class="w-3/4 h-0.5 bg-current opacity-40 self-start"></span>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-sm font-extrabold">Lanskap</div>
+                        <div class="text-[11px] text-stone-500 font-medium">Mendatar (Landscape)</div>
+                    </div>
+                </button>
+            </div>
+
+            <div class="pt-3 border-t border-stone-200 flex items-center justify-end space-x-3">
+                <button type="button" onclick="tutupModalOrientasiCetak()" class="px-4 py-2.5 text-sm font-semibold text-stone-600 hover:text-stone-900 transition">
+                    Batal
+                </button>
+                <button type="button" onclick="eksekusiCetakDenganOrientasi()"
+                    class="px-5 py-2.5 bg-brown-900 hover:bg-brown-800 text-white text-sm font-bold rounded-xl shadow-md hover:shadow-lg transition flex items-center space-x-2">
+                    <i class="fas fa-print"></i>
+                    <span>Lanjut Cetak / PDF</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
 <!-- JAVASCRIPT LOGIC                           -->
 <!-- ========================================== -->
 <script>
@@ -5234,7 +5303,7 @@
             <p style="text-align:justify; text-indent:36px;">Demikian surat keterangan ini dibuat dengan sebenarnya untuk dapat dipergunakan sebagaimana mestinya.</p>
             ${buatBlokTtdKepsek(tanggal)}
         `;
-        bukaJendelaCetakSurat('Surat Keterangan Aktif - ' + s.nama, isiHtml);
+        bukaJendelaCetakSurat('Surat Keterangan Aktif - ' + s.nama, isiHtml, 'portrait');
     }
 
     function bukaModalSuratPindah(siswaId) {
@@ -5445,7 +5514,7 @@
                 </table>
             </div>
         `;
-        bukaJendelaCetakSurat('Surat Keterangan Pindah - ' + s.nama, isiHtml);
+        bukaJendelaCetakSurat('Surat Keterangan Pindah - ' + s.nama, isiHtml, 'portrait');
     }
 
     function bukaModalSuratLulus(siswaId) {
@@ -5490,7 +5559,7 @@
             <p style="text-align:justify; text-indent:36px;">Dari satuan pendidikan ${escapeHtml(dataSekolah.nama || 'SDN 22 Tanah Keras')} Tahun Pelajaran ${escapeHtml(s.tahunKeluar || dataSekolah.tahun || '2026/2027')}.</p>
             ${buatBlokTtdKepsek(tanggal)}
         `;
-        bukaJendelaCetakSurat('SKL - ' + s.nama, isiHtml);
+        bukaJendelaCetakSurat('SKL - ' + s.nama, isiHtml, 'portrait');
     }
 
     function cetakSuratMenerimaSatuan(id) {
@@ -5599,7 +5668,7 @@
 
             ${buatBlokTtdKepsek(m.tanggal)}
         `;
-        bukaJendelaCetakSurat('Surat Bersedia Menerima - ' + m.nama, isiHtml);
+        bukaJendelaCetakSurat('Surat Bersedia Menerima - ' + m.nama, isiHtml, 'portrait');
     }
 
     function buatHtmlKopSurat() {
@@ -5660,30 +5729,79 @@
         `;
     }
 
-    function bukaJendelaCetakSurat(judulDokumen, isiHtml) {
-        const win = window.open('', '_blank', 'width=900,height=700');
+    let pendingDokumenCetak = {
+        judul: '',
+        isiHtml: '',
+        orientasi: 'portrait'
+    };
+
+    function pilihOrientasiCetak(orientasi) {
+        pendingDokumenCetak.orientasi = orientasi === 'landscape' ? 'landscape' : 'portrait';
+        const btnPotret = document.getElementById('btnPilihPotret');
+        const btnLanskap = document.getElementById('btnPilihLanskap');
+        if (!btnPotret || !btnLanskap) return;
+
+        if (pendingDokumenCetak.orientasi === 'portrait') {
+            btnPotret.className = 'p-4 rounded-2xl border-2 border-brown-700 bg-brown-50/80 text-brown-950 flex flex-col items-center justify-center space-y-2.5 transition shadow-xs hover:bg-brown-100/70';
+            btnLanskap.className = 'p-4 rounded-2xl border-2 border-stone-200 bg-white text-stone-700 flex flex-col items-center justify-center space-y-2.5 transition hover:border-brown-400 hover:bg-brown-50/40';
+        } else {
+            btnLanskap.className = 'p-4 rounded-2xl border-2 border-brown-700 bg-brown-50/80 text-brown-950 flex flex-col items-center justify-center space-y-2.5 transition shadow-xs hover:bg-brown-100/70';
+            btnPotret.className = 'p-4 rounded-2xl border-2 border-stone-200 bg-white text-stone-700 flex flex-col items-center justify-center space-y-2.5 transition hover:border-brown-400 hover:bg-brown-50/40';
+        }
+    }
+
+    function tutupModalOrientasiCetak() {
+        tutupModalHalus('modalPilihOrientasiCetak');
+    }
+
+    function bukaJendelaCetakSurat(judulDokumen, isiHtml, defaultOrientasi = 'portrait') {
+        pendingDokumenCetak = {
+            judul: judulDokumen,
+            isiHtml: isiHtml,
+            orientasi: defaultOrientasi === 'landscape' ? 'landscape' : 'portrait'
+        };
+        const subEl = document.getElementById('orientasiCetakSubtitle');
+        if (subEl) subEl.textContent = judulDokumen;
+        pilihOrientasiCetak(pendingDokumenCetak.orientasi);
+
+        const modal = document.getElementById('modalPilihOrientasiCetak');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    }
+
+    function eksekusiCetakDenganOrientasi() {
+        const { judul, isiHtml, orientasi } = pendingDokumenCetak;
+        tutupModalOrientasiCetak();
+
+        const win = window.open('', '_blank', 'width=960,height=720');
         if (!win) {
             tampilkanToast('Pop-up diblokir browser. Izinkan pop-up untuk mencetak.', 'warning');
             return;
         }
+        const isLandscape = orientasi === 'landscape';
         win.document.write(`
             <!DOCTYPE html>
             <html>
             <head>
-                <title>${escapeHtml(judulDokumen)}</title>
+                <title>${escapeHtml(judul)}</title>
                 <style>
-                    /* Margin Narrow (0.5 inci / 12.7 mm di semua sisi) */
+                    /* Mengatur orientasi halaman sesuai pilihan Potret (portrait) atau Lanskap (landscape) */
                     @page {
-                        size: A4;
+                        size: A4 ${isLandscape ? 'landscape' : 'portrait'};
                         margin: 12.7mm 12.7mm 12.7mm 12.7mm;
                     }
                     html, body {
                         margin: 0;
                         padding: 0;
                         font-family: 'Times New Roman', Times, serif;
-                        font-size: 11.5pt;
+                        font-size: ${isLandscape ? '10.5pt' : '11.5pt'};
                         color: #000;
                         line-height: 1.4;
+                    }
+                    table {
+                        width: 100%;
                     }
                     @media print {
                         body {
@@ -5696,7 +5814,14 @@
             <body>
                 ${buatHtmlKopSurat()}
                 ${isiHtml}
-                <script>window.onload = function(){ window.print(); };<\/script>
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.focus();
+                            window.print();
+                        }, 250);
+                    };
+                <\/script>
             </body>
             </html>
         `);
@@ -5706,9 +5831,9 @@
     // ==========================================
     // CETAK & EKSPOR EXCEL TABEL DATA
     // ==========================================
-    function cetakTabelHtml(judul, headers, rows) {
-        const theadHtml = headers.map(h => `<th style="border:1px solid #333; padding:6px 8px; background:#eee; font-size:10pt;">${escapeHtml(h)}</th>`).join('');
-        const tbodyHtml = rows.map(r => `<tr>${r.map(c => `<td style="border:1px solid #333; padding:5px 8px; font-size:9.5pt;">${escapeHtml(String(c ?? '-'))}</td>`).join('')}</tr>`).join('');
+    function cetakTabelHtml(judul, headers, rows, defaultOrientasi = 'landscape') {
+        const theadHtml = headers.map(h => `<th style="border:1px solid #333; padding:6px 8px; background:#eee; font-size:9.5pt;">${escapeHtml(h)}</th>`).join('');
+        const tbodyHtml = rows.map(r => `<tr>${r.map(c => `<td style="border:1px solid #333; padding:5px 8px; font-size:9pt;">${escapeHtml(String(c ?? '-'))}</td>`).join('')}</tr>`).join('');
         const isiHtml = `
             <h3 style="text-align:center; margin-bottom:12px; text-transform:uppercase;">${escapeHtml(judul)}</h3>
             <table style="width:100%; border-collapse:collapse;">
@@ -5717,19 +5842,89 @@
             </table>
             ${buatBlokTtdKepsek()}
         `;
-        bukaJendelaCetakSurat(judul, isiHtml);
+        bukaJendelaCetakSurat(judul, isiHtml, defaultOrientasi);
     }
 
-    function unduhFileExcel(namaFile, sheetName, headers, rows) {
+    /**
+     * Membuat worksheet Excel yang rapi lengkap dengan Kop/Judul Laporan,
+     * Subjudul Filter, Header Tabel, serta lebar kolom & tinggi baris otomatis.
+     */
+    function buatWorksheetRapi(judulLaporan, subJudul, headers, rows) {
+        const namaSekolah = (dataSekolah.nama || 'SDN 22 TANAH KERAS').toUpperCase();
+        const aoa = [
+            [namaSekolah],
+            [judulLaporan.toUpperCase()],
+            [subJudul || `Dicetak pada: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`],
+            [], // Baris pemisah kosong
+            headers,
+            ...rows
+        ];
+
+        const ws = XLSX.utils.aoa_to_sheet(aoa);
+        const totalCols = headers.length;
+
+        // Gabungkan sel judul di baris 1, 2, dan 3 agar rata tengah rapi sepanjang lebar tabel
+        if (totalCols > 1) {
+            ws['!merges'] = [
+                { s: { r: 0, c: 0 }, e: { r: 0, c: totalCols - 1 } },
+                { s: { r: 1, c: 0 }, e: { r: 1, c: totalCols - 1 } },
+                { s: { r: 2, c: 0 }, e: { r: 2, c: totalCols - 1 } }
+            ];
+        }
+
+        // Atur tinggi baris judul & header tabel
+        ws['!rows'] = [
+            { hpt: 22 },
+            { hpt: 20 },
+            { hpt: 16 },
+            { hpt: 10 },
+            { hpt: 24 }
+        ];
+
+        // Hitung lebar kolom otomatis berdasarkan isi terpanjang
+        const colWidths = headers.map((h, colIdx) => {
+            let maxLen = String(h || '').length;
+            rows.forEach(r => {
+                const cellVal = String(r[colIdx] ?? '');
+                if (cellVal.length > maxLen) maxLen = cellVal.length;
+            });
+            return { wch: Math.min(Math.max(maxLen + 4, colIdx === 0 ? 6 : 14), 48) };
+        });
+        ws['!cols'] = colWidths;
+
+        // Tambahkan AutoFilter tepat pada baris header tabel (baris ke-5 / index 4)
+        if (rows.length > 0 && totalCols > 0) {
+            const lastColLetter = XLSX.utils.encode_col(totalCols - 1);
+            ws['!autofilter'] = { ref: `A5:${lastColLetter}${5 + rows.length}` };
+        }
+
+        return ws;
+    }
+
+    function unduhFileExcel(namaFile, sheetName, headers, rows, judulLaporan = '', subJudul = '') {
         if (typeof XLSX === 'undefined') {
             tampilkanToast('Library Excel belum siap.', 'warning');
             return;
         }
-        const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+        const ws = buatWorksheetRapi(judulLaporan || sheetName, subJudul, headers, rows);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+        XLSX.utils.book_append_sheet(wb, ws, String(sheetName).slice(0, 31));
         XLSX.writeFile(wb, namaFile);
         tampilkanToast(`File ${namaFile} berhasil diunduh!`);
+    }
+
+    function unduhFileExcelMultiSheet(namaFile, daftarSheet) {
+        if (typeof XLSX === 'undefined') {
+            tampilkanToast('Library Excel belum siap.', 'warning');
+            return;
+        }
+        const wb = XLSX.utils.book_new();
+        daftarSheet.forEach(item => {
+            const ws = buatWorksheetRapi(item.judulLaporan || item.sheetName, item.subJudul || '', item.headers, item.rows);
+            XLSX.utils.book_append_sheet(wb, ws, String(item.sheetName).slice(0, 31));
+        });
+        XLSX.writeFile(wb, namaFile);
+        tampilkanToast(`File ${namaFile} (${daftarSheet.length} sheet) berhasil diunduh!`);
     }
 
     function cetakDataSiswa() {
@@ -5759,82 +5954,348 @@
             tampilkanToast('Tidak ada data siswa pada filter yang dipilih untuk diekspor.', 'warning');
             return;
         }
+
         const filterKls = document.getElementById('filterKelas')?.value || '';
-        const labelFile = filterKls ? `_${filterKls.replace(/\s+/g, '_')}` : '_Semua_Kelas';
+        const filterTp = document.getElementById('filterTahunSiswa')?.value || '';
+        const filterSem = document.getElementById('filterSemesterSiswa')?.value || '';
+        const keyword = (document.getElementById('searchSiswa')?.value || '').trim();
 
         const headers = ['No', 'Nama Lengkap', 'Jenis Kelamin', 'Tempat / Tanggal Lahir', 'NISN / NIS', 'NIK', 'Kelas', 'Tahun Pelajaran', 'Semester', 'Alamat', 'Nama Ayah', 'Pekerjaan Ayah', 'Nama Ibu', 'Pekerjaan Ibu'];
-        const rows = dataEkspor.map((s, i) => [i + 1, s.nama, s.jk, s.ttl, s.nisn, s.nik, s.kelas, s.tahun, s.semester, s.alamat, s.ayah, s.pekAyah, s.ibu, s.pekIbu]);
-        unduhFileExcel(`PD_Aktif${labelFile}_SDN22.xlsx`, filterKls || 'PD Aktif', headers, rows);
+        const mapBaris = (list) => list.map((s, i) => [
+            i + 1, s.nama, s.jk, s.ttl, s.nisn, s.nik, s.kelas, s.tahun, s.semester, s.alamat, s.ayah, s.pekAyah, s.ibu, s.pekIbu
+        ]);
+
+        const infoFilter = [
+            filterTp ? `Tahun Pelajaran: ${filterTp}` : 'Semua Tahun Pelajaran',
+            filterSem ? `Semester: ${filterSem}` : 'Semua Semester',
+            keyword ? `Pencarian: "${keyword}"` : ''
+        ].filter(Boolean).join(' | ');
+
+        // Jika filter Kelas spesifik dipilih (misal hanya Kelas 1), buat 1 sheet khusus kelas tersebut
+        if (filterKls) {
+            const labelFile = `_${filterKls.replace(/\s+/g, '_')}`;
+            unduhFileExcel(
+                `PD_Aktif${labelFile}_SDN22.xlsx`,
+                filterKls,
+                headers,
+                mapBaris(dataEkspor),
+                `DAFTAR PESERTA DIDIK AKTIF - ${filterKls.toUpperCase()}`,
+                `${infoFilter} | Total: ${dataEkspor.length} Siswa`
+            );
+            return;
+        }
+
+        // Jika "Semua Kelas" dipilih, otomatis bagi menjadi beberapa sheet (Kelas 1 - Kelas 6)
+        const urutanKelas = ['Kelas 1', 'Kelas 2', 'Kelas 3', 'Kelas 4', 'Kelas 5', 'Kelas 6'];
+        const sheets = [];
+
+        urutanKelas.forEach(kls => {
+            const siswaPerKelas = dataEkspor.filter(s => String(s.kelas || '').trim().toLowerCase() === kls.toLowerCase());
+            if (siswaPerKelas.length > 0) {
+                sheets.push({
+                    sheetName: kls,
+                    judulLaporan: `DAFTAR PESERTA DIDIK AKTIF - ${kls.toUpperCase()}`,
+                    subJudul: `${infoFilter} | Total: ${siswaPerKelas.length} Siswa`,
+                    headers,
+                    rows: mapBaris(siswaPerKelas)
+                });
+            }
+        });
+
+        // Tambahkan sheet "Lainnya" jika ada siswa dengan format kelas di luar Kelas 1 - 6
+        const kelasLain = dataEkspor.filter(s => !urutanKelas.some(k => k.toLowerCase() === String(s.kelas || '').trim().toLowerCase()));
+        if (kelasLain.length > 0) {
+            sheets.push({
+                sheetName: 'Kelas Lainnya',
+                judulLaporan: 'DAFTAR PESERTA DIDIK AKTIF - KELAS LAINNYA',
+                subJudul: `${infoFilter} | Total: ${kelasLain.length} Siswa`,
+                headers,
+                rows: mapBaris(kelasLain)
+            });
+        }
+
+        if (sheets.length === 1) {
+            unduhFileExcel(`PD_Aktif_${sheets[0].sheetName.replace(/\s+/g, '_')}_SDN22.xlsx`, sheets[0].sheetName, headers, sheets[0].rows, sheets[0].judulLaporan, sheets[0].subJudul);
+        } else {
+            unduhFileExcelMultiSheet('PD_Aktif_Per_Kelas_SDN22.xlsx', sheets);
+        }
     }
 
-    function exportExcelSiswa() {
-        const headers = ['No', 'Nama Lengkap', 'Jenis Kelamin', 'Tempat / Tanggal Lahir', 'NISN / NIS', 'NIK', 'Kelas', 'Tahun Pelajaran', 'Semester', 'Alamat', 'Nama Ayah', 'Pekerjaan Ayah', 'Nama Ibu', 'Pekerjaan Ibu'];
-        const rows = daftarSiswa.map((s, i) => [i + 1, s.nama, s.jk, s.ttl, s.nisn, s.nik, s.kelas, s.tahun, s.semester, s.alamat, s.ayah, s.pekAyah, s.ibu, s.pekIbu]);
-        unduhFileExcel('PD_Aktif_SDN22.xlsx', 'PD Aktif', headers, rows);
+    function getFilteredSiswaKeluar() {
+        const filterJenis = document.getElementById('filterJenisKeluar')?.value || '';
+        const keyword = (document.getElementById('searchSiswaKeluar')?.value || '').toLowerCase().trim();
+        return daftarSiswaKeluar.filter(s => {
+            if (filterJenis && s.jenisKeluar !== filterJenis) return false;
+            if (keyword) {
+                const hay = `${s.nama} ${s.nisn} ${s.noSurat} ${s.sekolahTujuan} ${s.alasan}`.toLowerCase();
+                if (!hay.includes(keyword)) return false;
+            }
+            return true;
+        });
     }
 
     function cetakDataSiswaKeluar() {
+        const data = getFilteredSiswaKeluar();
+        if (data.length === 0) {
+            tampilkanToast('Tidak ada data PD Keluar pada filter yang dipilih.', 'warning');
+            return;
+        }
         const headers = ['No', 'Nama Lengkap', 'NISN/NIS', 'Kelas Asal', 'Status Keluar', 'Tanggal Keluar', 'No Surat', 'Sekolah Tujuan', 'Alasan'];
-        const rows = daftarSiswaKeluar.map((s, i) => [i + 1, s.nama, s.nisn, s.kelas, s.jenisKeluar, s.tanggalKeluar, s.noSurat, s.sekolahTujuan, s.alasan]);
+        const rows = data.map((s, i) => [i + 1, s.nama, s.nisn, s.kelas, s.jenisKeluar, s.tanggalKeluar, s.noSurat, s.sekolahTujuan, s.alasan]);
         cetakTabelHtml('Daftar Peserta Didik Keluar / Mutasi', headers, rows);
     }
 
     function exportExcelSiswaKeluar() {
+        const data = getFilteredSiswaKeluar();
+        if (data.length === 0) {
+            tampilkanToast('Tidak ada data PD Keluar pada filter yang dipilih untuk diekspor.', 'warning');
+            return;
+        }
+        const filterJenis = document.getElementById('filterJenisKeluar')?.value || '';
         const headers = ['No', 'Nama Lengkap', 'JK', 'TTL', 'NISN/NIS', 'Kelas Asal', 'Status Keluar', 'Tahun Keluar', 'Tanggal Keluar', 'No Surat', 'Sekolah Tujuan', 'Kecamatan', 'Kabupaten', 'Provinsi', 'Alasan'];
-        const rows = daftarSiswaKeluar.map((s, i) => [i + 1, s.nama, s.jk, s.ttl, s.nisn, s.kelas, s.jenisKeluar, s.tahunKeluar, s.tanggalKeluar, s.noSurat, s.sekolahTujuan, s.kecamatan, s.kabupaten, s.provinsi, s.alasan]);
-        unduhFileExcel('PD_Keluar_SDN22.xlsx', 'PD Keluar', headers, rows);
+        const rows = data.map((s, i) => [i + 1, s.nama, s.jk, s.ttl, s.nisn, s.kelas, s.jenisKeluar, s.tahunKeluar, s.tanggalKeluar, s.noSurat, s.sekolahTujuan, s.kecamatan, s.kabupaten, s.provinsi, s.alasan]);
+        unduhFileExcel(
+            filterJenis ? `PD_Keluar_${filterJenis.replace(/[^a-zA-Z0-9]+/g, '_')}_SDN22.xlsx` : 'PD_Keluar_SDN22.xlsx',
+            'PD Keluar',
+            headers,
+            rows,
+            'DAFTAR PESERTA DIDIK KELUAR / MUTASI',
+            `${filterJenis ? 'Status: ' + filterJenis : 'Semua Status Keluar'} | Total: ${data.length} Siswa`
+        );
+    }
+
+    function getFilteredSortedNis() {
+        const filterTp = document.getElementById('filterTahunNis')?.value || '';
+        const filterKls = document.getElementById('filterKelasNis')?.value || '';
+        const keyword = (document.getElementById('searchNis')?.value || '').toLowerCase().trim();
+
+        const filtered = daftarNis.filter(n => {
+            if (filterTp && n.tahun !== filterTp) return false;
+            if (filterKls && n.kelas !== filterKls) return false;
+            if (keyword) {
+                const hay = `${n.nis || n.nomor} ${n.nama} ${n.kelas} ${n.keterangan}`.toLowerCase();
+                if (!hay.includes(keyword)) return false;
+            }
+            return true;
+        });
+
+        return filtered.sort((a, b) => {
+            const klsA = parseInt(String(a.kelas || '').replace(/\D/g, ''), 10) || 99;
+            const klsB = parseInt(String(b.kelas || '').replace(/\D/g, ''), 10) || 99;
+            if (klsA !== klsB) return klsA - klsB;
+            return String(a.nis || a.nomor || '').localeCompare(String(b.nis || b.nomor || ''), 'id', { numeric: true });
+        });
     }
 
     function cetakDataNis() {
+        const data = getFilteredSortedNis();
+        if (data.length === 0) {
+            tampilkanToast('Tidak ada data NIS pada filter yang dipilih.', 'warning');
+            return;
+        }
         const headers = ['No', 'NIS', 'Nama Siswa', 'Kelas', 'Tahun Pelajaran', 'Keterangan'];
-        const rows = daftarNis.map((n, i) => [i + 1, n.nis || n.nomor, n.nama, n.kelas, n.tahun, n.keterangan]);
+        const rows = data.map((n, i) => [i + 1, n.nis || n.nomor, n.nama, n.kelas, n.tahun, n.keterangan]);
         cetakTabelHtml('Daftar Nomor Induk Siswa (NIS)', headers, rows);
     }
 
     function exportExcelNis() {
+        const data = getFilteredSortedNis();
+        if (data.length === 0) {
+            tampilkanToast('Tidak ada data NIS pada filter yang dipilih untuk diekspor.', 'warning');
+            return;
+        }
+        const filterTp = document.getElementById('filterTahunNis')?.value || '';
+        const filterKls = document.getElementById('filterKelasNis')?.value || '';
         const headers = ['No', 'NIS', 'Nama Siswa', 'Kelas', 'Tahun Pelajaran', 'Keterangan'];
-        const rows = daftarNis.map((n, i) => [i + 1, n.nis || n.nomor, n.nama, n.kelas, n.tahun, n.keterangan]);
-        unduhFileExcel('Data_NIS_SDN22.xlsx', 'Data NIS', headers, rows);
+        const mapBaris = (list) => list.map((n, i) => [i + 1, n.nis || n.nomor, n.nama, n.kelas, n.tahun, n.keterangan]);
+        const infoTp = filterTp ? `Tahun Pelajaran: ${filterTp}` : 'Semua Tahun Pelajaran';
+
+        if (filterKls) {
+            unduhFileExcel(
+                `Data_NIS_${filterKls.replace(/\s+/g, '_')}_SDN22.xlsx`,
+                filterKls,
+                headers,
+                mapBaris(data),
+                `DAFTAR NOMOR INDUK SISWA (NIS) - ${filterKls.toUpperCase()}`,
+                `${infoTp} | Total: ${data.length} Siswa`
+            );
+            return;
+        }
+
+        const urutanKelas = ['Kelas 1', 'Kelas 2', 'Kelas 3', 'Kelas 4', 'Kelas 5', 'Kelas 6'];
+        const sheets = [];
+        urutanKelas.forEach(kls => {
+            const perKls = data.filter(n => String(n.kelas || '').trim().toLowerCase() === kls.toLowerCase());
+            if (perKls.length > 0) {
+                sheets.push({
+                    sheetName: kls,
+                    judulLaporan: `DAFTAR NOMOR INDUK SISWA (NIS) - ${kls.toUpperCase()}`,
+                    subJudul: `${infoTp} | Total: ${perKls.length} Siswa`,
+                    headers,
+                    rows: mapBaris(perKls)
+                });
+            }
+        });
+
+        const lain = data.filter(n => !urutanKelas.some(k => k.toLowerCase() === String(n.kelas || '').trim().toLowerCase()));
+        if (lain.length > 0) {
+            sheets.push({
+                sheetName: 'Lainnya',
+                judulLaporan: 'DAFTAR NOMOR INDUK SISWA (NIS) - LAINNYA',
+                subJudul: `${infoTp} | Total: ${lain.length} Siswa`,
+                headers,
+                rows: mapBaris(lain)
+            });
+        }
+
+        if (sheets.length === 1) {
+            unduhFileExcel(`Data_NIS_${sheets[0].sheetName.replace(/\s+/g, '_')}_SDN22.xlsx`, sheets[0].sheetName, headers, sheets[0].rows, sheets[0].judulLaporan, sheets[0].subJudul);
+        } else {
+            unduhFileExcelMultiSheet('Data_NIS_Per_Kelas_SDN22.xlsx', sheets);
+        }
+    }
+
+    function getFilteredGtk(kategori) {
+        const isGuru = kategori === 'guru';
+        const filterStatus = document.getElementById(isGuru ? 'filterStatusGuru' : 'filterStatusTendik')?.value || '';
+        const keyword = (document.getElementById(isGuru ? 'searchGuru' : 'searchTendik')?.value || '').toLowerCase().trim();
+        const source = isGuru ? daftarGuru : daftarTendik;
+        return source.filter(g => {
+            if (filterStatus && g.status !== filterStatus) return false;
+            if (keyword) {
+                const hay = `${g.nama} ${g.nip} ${g.nik} ${g.jabatan} ${g.status}`.toLowerCase();
+                if (!hay.includes(keyword)) return false;
+            }
+            return true;
+        });
     }
 
     function cetakDataGtk(kategori) {
-        const list = kategori === 'guru' ? daftarGuru : daftarTendik;
+        const list = getFilteredGtk(kategori);
+        if (list.length === 0) {
+            tampilkanToast(`Tidak ada data ${kategori} pada filter yang dipilih.`, 'warning');
+            return;
+        }
         const headers = ['No', 'Nama Pegawai', 'Status', 'NIP', 'Jabatan', 'NIK', 'NPWP', 'Tempat/Tgl Lahir'];
         const rows = list.map((g, i) => [i + 1, g.nama, g.status, g.nip, g.jabatan, g.nik, g.npwp, `${g.tempatLahir || '-'}, ${g.tanggalLahir || '-'}`]);
         cetakTabelHtml(kategori === 'guru' ? 'Daftar Pendidik / Guru' : 'Daftar Tenaga Kependidikan', headers, rows);
     }
 
     function exportExcelGtk(kategori) {
-        const list = kategori === 'guru' ? daftarGuru : daftarTendik;
+        const isGuru = kategori === 'guru';
+        const list = getFilteredGtk(kategori);
+        if (list.length === 0) {
+            tampilkanToast(`Tidak ada data ${kategori} pada filter yang dipilih untuk diekspor.`, 'warning');
+            return;
+        }
+        const filterStatus = document.getElementById(isGuru ? 'filterStatusGuru' : 'filterStatusTendik')?.value || '';
         const headers = ['No', 'Nama Pegawai', 'Status Kepegawaian', 'NIP', 'Jabatan', 'NIK', 'NPWP', 'Tempat Lahir', 'Tanggal Lahir'];
         const rows = list.map((g, i) => [i + 1, g.nama, g.status, g.nip, g.jabatan, g.nik, g.npwp, g.tempatLahir, g.tanggalLahir]);
-        unduhFileExcel(kategori === 'guru' ? 'Data_Guru_SDN22.xlsx' : 'Data_Tendik_SDN22.xlsx', kategori.toUpperCase(), headers, rows);
+        unduhFileExcel(
+            isGuru ? 'Data_Guru_SDN22.xlsx' : 'Data_Tendik_SDN22.xlsx',
+            isGuru ? 'Data Guru' : 'Data Tendik',
+            headers,
+            rows,
+            isGuru ? 'DAFTAR PENDIDIK / GURU' : 'DAFTAR TENAGA KEPENDIDIKAN (TENDIK)',
+            `${filterStatus ? 'Status: ' + filterStatus : 'Semua Status Kepegawaian'} | Total: ${list.length} Pegawai`
+        );
+    }
+
+    function getFilteredSurat(jenis) {
+        const isMasuk = jenis === 'masuk';
+        const filterTp = document.getElementById(isMasuk ? 'filterTahunSuratMasuk' : 'filterTahunSuratKeluar')?.value || '';
+        const tglDari = document.getElementById(isMasuk ? 'filterTglDariMasuk' : 'filterTglDariKeluar')?.value || '';
+        const tglKe = document.getElementById(isMasuk ? 'filterTglKeMasuk' : 'filterTglKeKeluar')?.value || '';
+        const keyword = (document.getElementById(isMasuk ? 'searchSuratMasuk' : 'searchSuratKeluar')?.value || '').toLowerCase().trim();
+        const source = isMasuk ? daftarSuratMasuk : daftarSuratKeluar;
+
+        return source.filter(s => {
+            if (filterTp && s.tahun !== filterTp) return false;
+            if (tglDari && s.tanggal && s.tanggal < tglDari) return false;
+            if (tglKe && s.tanggal && s.tanggal > tglKe) return false;
+            if (keyword) {
+                const hay = `${s.nomor} ${s.pihak} ${s.perihal} ${s.tahun}`.toLowerCase();
+                if (!hay.includes(keyword)) return false;
+            }
+            return true;
+        });
     }
 
     function cetakDataSurat(jenis) {
-        const list = jenis === 'masuk' ? daftarSuratMasuk : daftarSuratKeluar;
+        const list = getFilteredSurat(jenis);
+        if (list.length === 0) {
+            tampilkanToast(`Tidak ada data surat ${jenis} pada filter yang dipilih.`, 'warning');
+            return;
+        }
         const headers = ['No', 'Nomor Surat', 'Tanggal Surat', 'Tahun Pelajaran', jenis === 'masuk' ? 'Pengirim' : 'Tujuan Surat', 'Perihal'];
         const rows = list.map((s, i) => [i + 1, s.nomor, s.tanggal, s.tahun, s.pihak, s.perihal]);
         cetakTabelHtml(jenis === 'masuk' ? 'Buku Agenda Surat Masuk' : 'Buku Agenda Surat Keluar', headers, rows);
     }
 
     function exportExcelSurat(jenis) {
-        const list = jenis === 'masuk' ? daftarSuratMasuk : daftarSuratKeluar;
-        const headers = ['No', 'Nomor Surat', 'Tanggal Surat', 'Tahun Pelajaran', jenis === 'masuk' ? 'Surat Dari' : 'Tujuan Surat', 'Perihal'];
+        const isMasuk = jenis === 'masuk';
+        const list = getFilteredSurat(jenis);
+        if (list.length === 0) {
+            tampilkanToast(`Tidak ada data surat ${jenis} pada filter yang dipilih untuk diekspor.`, 'warning');
+            return;
+        }
+        const filterTp = document.getElementById(isMasuk ? 'filterTahunSuratMasuk' : 'filterTahunSuratKeluar')?.value || '';
+        const tglDari = document.getElementById(isMasuk ? 'filterTglDariMasuk' : 'filterTglDariKeluar')?.value || '';
+        const tglKe = document.getElementById(isMasuk ? 'filterTglKeMasuk' : 'filterTglKeKeluar')?.value || '';
+        const ketFilter = [
+            filterTp ? `TP ${filterTp}` : 'Semua TP',
+            (tglDari || tglKe) ? `Periode: ${tglDari || '...'} s.d. ${tglKe || '...'}` : '',
+            `Total: ${list.length} Surat`
+        ].filter(Boolean).join(' | ');
+
+        const headers = ['No', 'Nomor Surat', 'Tanggal Surat', 'Tahun Pelajaran', isMasuk ? 'Surat Dari' : 'Tujuan Surat', 'Perihal'];
         const rows = list.map((s, i) => [i + 1, s.nomor, s.tanggal, s.tahun, s.pihak, s.perihal]);
-        unduhFileExcel(jenis === 'masuk' ? 'Surat_Masuk_SDN22.xlsx' : 'Surat_Keluar_SDN22.xlsx', 'Agenda Surat', headers, rows);
+        unduhFileExcel(
+            isMasuk ? 'Surat_Masuk_SDN22.xlsx' : 'Surat_Keluar_SDN22.xlsx',
+            isMasuk ? 'Surat Masuk' : 'Surat Keluar',
+            headers,
+            rows,
+            isMasuk ? 'BUKU AGENDA SURAT MASUK' : 'BUKU AGENDA SURAT KELUAR',
+            ketFilter
+        );
+    }
+
+    function getFilteredSuratMenerima() {
+        const keyword = (document.getElementById('searchSuratMenerima')?.value || '').toLowerCase().trim();
+        return daftarSuratMenerima.filter(m => {
+            if (!keyword) return true;
+            const hay = `${m.nomor} ${m.nama} ${m.nisn} ${m.kelas} ${m.ortu} ${m.alamat}`.toLowerCase();
+            return hay.includes(keyword);
+        });
     }
 
     function cetakRekapSuratMenerima() {
+        const list = getFilteredSuratMenerima();
+        if (list.length === 0) {
+            tampilkanToast('Tidak ada data Surat Menerima pada filter yang dipilih.', 'warning');
+            return;
+        }
         const headers = ['No', 'Nomor Surat', 'Tanggal', 'Nama Siswa', 'JK', 'TTL', 'NISN', 'Kelas', 'Orang Tua', 'Alamat'];
-        const rows = daftarSuratMenerima.map((m, i) => [i + 1, m.nomor, m.tanggal, m.nama, m.jk, m.ttl, m.nisn, m.kelas, m.ortu, m.alamat]);
+        const rows = list.map((m, i) => [i + 1, m.nomor, m.tanggal, m.nama, m.jk, m.ttl, m.nisn, m.kelas, m.ortu, m.alamat]);
         cetakTabelHtml('Rekap Surat Bersedia Menerima Siswa Pindahan', headers, rows);
     }
 
     function exportExcelSuratMenerima() {
+        const list = getFilteredSuratMenerima();
+        if (list.length === 0) {
+            tampilkanToast('Tidak ada data Surat Menerima pada filter yang dipilih untuk diekspor.', 'warning');
+            return;
+        }
         const headers = ['No', 'Nomor Surat', 'Tanggal Surat', 'Nama Siswa', 'Jenis Kelamin', 'Tempat/Tgl Lahir', 'NISN', 'Diterima di Kelas', 'Orang Tua', 'Alamat'];
-        const rows = daftarSuratMenerima.map((m, i) => [i + 1, m.nomor, m.tanggal, m.nama, m.jk, m.ttl, m.nisn, m.kelas, m.ortu, m.alamat]);
-        unduhFileExcel('Surat_Menerima_SDN22.xlsx', 'Surat Menerima', headers, rows);
+        const rows = list.map((m, i) => [i + 1, m.nomor, m.tanggal, m.nama, m.jk, m.ttl, m.nisn, m.kelas, m.ortu, m.alamat]);
+        unduhFileExcel(
+            'Surat_Menerima_SDN22.xlsx',
+            'Surat Menerima',
+            headers,
+            rows,
+            'REKAP SURAT BERSEDIA MENERIMA SISWA PINDAHAN',
+            `Total: ${list.length} Surat`
+        );
     }
 
     // ==========================================
